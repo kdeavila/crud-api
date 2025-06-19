@@ -4,3 +4,6 @@ GET {{crud_api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+GET {{crud_api_HostAddress}}/profile/list
+
+###
