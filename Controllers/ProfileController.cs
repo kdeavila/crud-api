@@ -1,6 +1,5 @@
 using crud_api.Context;
 using crud_api.DTOS;
-using crud_api.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

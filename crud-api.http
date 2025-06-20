@@ -1,9 +1,22 @@
 @crud_api_HostAddress = http://localhost:5190
 
-GET {{crud_api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
+### Get all profiles
 GET {{crud_api_HostAddress}}/profile/list
+
+### Get all employees
+GET {{crud_api_HostAddress}}/employee/list
+
+### Get one employee by id
+GET {{crud_api_HostAddress}}/employee/list/1
+
+### Create new employee
+POST {{crud_api_HostAddress}}/employee/create
+Content-Type: application/json
+
+{
+  "FullName": "Keyner de Ávila",
+  "Salary": 100,
+  "IdProfile": 1
+}
 
 ###
