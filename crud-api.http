@@ -7,7 +7,7 @@ GET {{crud_api_HostAddress}}/profile/list
 GET {{crud_api_HostAddress}}/employee/list
 
 ### Get one employee by id
-GET {{crud_api_HostAddress}}/employee/list/1
+GET {{crud_api_HostAddress}}/employee/list/18
 
 ### Create new employee
 POST {{crud_api_HostAddress}}/employee/create

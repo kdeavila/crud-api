@@ -8,11 +8,10 @@ namespace crud_api.Controllers;
 
 [Route("/[controller]")]
 [ApiController]
-
 public class EmployeeController(AppDbContext context) : ControllerBase
 {
     private readonly AppDbContext _context = context;
-    
+
     [HttpGet("list")]
     public async Task<ActionResult<List<EmployeeDTO>>> Get()
     {
@@ -55,11 +54,55 @@ public class EmployeeController(AppDbContext context) : ControllerBase
         {
             FullName = dtoEmployee.FullName,
             Salary = dtoEmployee.Salary,
-            IdProfile = dtoEmployee.IdProfile
+            IdProfile = dtoEmployee.IdProfile,
         };
-        
+
         await _context.Employees.AddAsync(dbEmployee);
         await _context.SaveChangesAsync();
-        return Ok(dbEmployee);
+
+        var createdEmployeeDto = await _context.Employees
+            .Include(e => e.ProfileReference)
+            .Where(e => e.Id == dbEmployee.Id)
+            .Select(e => new EmployeeDTO
+            {
+                Id = e.Id,
+                FullName = e.FullName,
+                Salary = e.Salary,
+                IdProfile = e.IdProfile,
+                NameProfile = e.ProfileReference.Name
+            }).FirstAsync();
+        
+        return Ok(createdEmployeeDto);
+    }
+
+    [HttpPut("edit")]
+    public async Task<ActionResult<EmployeeDTO>> Edit(EmployeeDTO dtoEmployee)
+    {
+        var dbEmployee = await _context.Employees.Include(p => p.ProfileReference)
+            .Where(e => e.Id == dtoEmployee.Id).FirstAsync();
+
+        dbEmployee.FullName = dtoEmployee.FullName;
+        dbEmployee.Salary = dtoEmployee.Salary;
+        dbEmployee.IdProfile = dtoEmployee.IdProfile;
+
+        _context.Employees.Update(dbEmployee);
+        await _context.SaveChangesAsync();
+        return Ok("Employee edited successfully!");
+    }
+
+    [HttpDelete("delete/{id}")]
+    public async Task<ActionResult<EmployeeDTO>> Delete(int id)
+    {
+        var dbEmployee = await _context.Employees.Where(e => e.Id == id).FirstAsync();
+
+        if (dbEmployee is null)
+        {
+            return NotFound("Employee not found!");
+        }
+
+        _context.Employees.Remove(dbEmployee);
+        await _context.SaveChangesAsync();
+        
+        return Ok("Employee deleted successfully!");
     }
 }
