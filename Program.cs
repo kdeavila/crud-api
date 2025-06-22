@@ -1,4 +1,5 @@
 using crud_api.Context;
+using crud_api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultString"));
 });
+builder.Services.AddScoped<ProfileService>();
 
 var app = builder.Build();
 

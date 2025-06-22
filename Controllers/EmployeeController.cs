@@ -87,18 +87,15 @@ public class EmployeeController(AppDbContext context) : ControllerBase
 
         _context.Employees.Update(dbEmployee);
         await _context.SaveChangesAsync();
+        
         return Ok("Employee edited successfully!");
     }
 
     [HttpDelete("delete/{id}")]
     public async Task<ActionResult<EmployeeDTO>> Delete(int id)
     {
-        var dbEmployee = await _context.Employees.Where(e => e.Id == id).FirstAsync();
-
-        if (dbEmployee is null)
-        {
-            return NotFound("Employee not found!");
-        }
+        var dbEmployee = await _context.Employees.Where(e => e.Id == id).FirstOrDefaultAsync();
+        if (dbEmployee is null) return NotFound("Employee not found!");
 
         _context.Employees.Remove(dbEmployee);
         await _context.SaveChangesAsync();

@@ -1,22 +1,38 @@
-@crud_api_HostAddress = http://localhost:5190
+@crud-api-host = http://localhost:5190
 
 ### Get all profiles
-GET {{crud_api_HostAddress}}/profile/list
+GET {{crud-api-host}}/profile/list
 
 ### Get all employees
-GET {{crud_api_HostAddress}}/employee/list
+GET {{crud-api-host}}/employee/list
 
 ### Get one employee by id
-GET {{crud_api_HostAddress}}/employee/list/18
+GET {{crud-api-host}}/employee/list/26
 
 ### Create new employee
-POST {{crud_api_HostAddress}}/employee/create
+POST {{crud-api-host}}/employee/create
 Content-Type: application/json
 
 {
-  "FullName": "Keyner de Ávila",
-  "Salary": 100,
-  "IdProfile": 1
+  "FullName": "Kenny",
+  "Salary": 1200,
+  "IdProfile": 3
 }
+
+###
+
+PUT {{crud-api-host}}/employee/edit
+Content-Type: application/json
+
+{
+  "id": 26,
+  "FullName": "Nuevos cambios",
+  "Salary": 90,
+  "IdProfile": 2
+}
+
+###
+
+DELETE {{crud-api-host}}/employee/delete/27
 
 ###
