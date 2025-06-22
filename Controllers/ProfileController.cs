@@ -12,8 +12,8 @@ public class ProfileController(ProfileService profileService) : ControllerBase
 {
     private readonly ProfileService _profileService = profileService;
 
-    [HttpGet("list")]
-    public async Task<ActionResult<List<ProfileDTO>>> Get()
+    [HttpGet("getall")]
+    public async Task<ActionResult<List<ProfileDTO>>> GetAll()
     {
         var profiles = await _profileService.List();
         return Ok(profiles);

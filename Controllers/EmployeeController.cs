@@ -1,105 +1,59 @@
-using crud_api.Context;
 using crud_api.DTOS;
-using crud_api.Entities;
+using crud_api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Controllers;
 
 [Route("/[controller]")]
 [ApiController]
-public class EmployeeController(AppDbContext context) : ControllerBase
+public class EmployeeController(EmployeeService employeeService) : ControllerBase
 {
-    private readonly AppDbContext _context = context;
+    private readonly EmployeeService _employeeService = employeeService;
 
-    [HttpGet("list")]
-    public async Task<ActionResult<List<EmployeeDTO>>> Get()
+    [HttpGet("getall")]
+    public async Task<ActionResult<List<EmployeeDTO>>> GetAll()
     {
-        var dtoList = new List<EmployeeDTO>();
-        var dbList = await _context.Employees.Include(p => p.ProfileReference).ToListAsync();
-
-        foreach (var e in dbList)
-        {
-            dtoList.Add(new EmployeeDTO
-            {
-                Id = e.Id,
-                FullName = e.FullName,
-                Salary = e.Salary,
-                IdProfile = e.IdProfile,
-                NameProfile = e.ProfileReference.Name
-            });
-        }
-
-        return Ok(dtoList);
+        var employees = await _employeeService.GetAll();
+        return Ok(employees);
     }
 
-    [HttpGet("list/{id}")]
-    public async Task<ActionResult<EmployeeDTO>> Get(int id)
+    [HttpGet("getbyid/{id:int}")]
+    public async Task<ActionResult<EmployeeDTO>> GetById(int id)
     {
-        var dtoEmployee = new EmployeeDTO();
-        var dbEmployee = await _context.Employees.Include(p => p.ProfileReference).Where(e => e.Id == id).FirstAsync();
-
-        dtoEmployee.Id = id;
-        dtoEmployee.FullName = dbEmployee.FullName;
-        dtoEmployee.Salary = dbEmployee.Salary;
-        dtoEmployee.IdProfile = dbEmployee.IdProfile;
-        dtoEmployee.NameProfile = dbEmployee.ProfileReference.Name;
-        return Ok(dtoEmployee);
+        var employee = await _employeeService.GetById(id);
+        
+        if (employee is null) return NotFound("Employee not found!");
+        return Ok(employee);
     }
 
     [HttpPost("create")]
     public async Task<ActionResult<EmployeeDTO>> Create(EmployeeDTO dtoEmployee)
     {
-        var dbEmployee = new Employee
+        var newEmployee = await _employeeService.Create(dtoEmployee);
+
+        if (newEmployee is null)
         {
-            FullName = dtoEmployee.FullName,
-            Salary = dtoEmployee.Salary,
-            IdProfile = dtoEmployee.IdProfile,
-        };
-
-        await _context.Employees.AddAsync(dbEmployee);
-        await _context.SaveChangesAsync();
-
-        var createdEmployeeDto = await _context.Employees
-            .Include(e => e.ProfileReference)
-            .Where(e => e.Id == dbEmployee.Id)
-            .Select(e => new EmployeeDTO
-            {
-                Id = e.Id,
-                FullName = e.FullName,
-                Salary = e.Salary,
-                IdProfile = e.IdProfile,
-                NameProfile = e.ProfileReference.Name
-            }).FirstAsync();
+            return BadRequest("Employee not created!");
+        }
         
-        return Ok(createdEmployeeDto);
+        return Ok(newEmployee);
     }
 
-    [HttpPut("edit")]
-    public async Task<ActionResult<EmployeeDTO>> Edit(EmployeeDTO dtoEmployee)
+    [HttpPut("update/{id:int}")]
+    public async Task<ActionResult<EmployeeDTO>> Update(int id, [FromBody] EmployeeDTO dtoEmployee)
     {
-        var dbEmployee = await _context.Employees.Include(p => p.ProfileReference)
-            .Where(e => e.Id == dtoEmployee.Id).FirstAsync();
-
-        dbEmployee.FullName = dtoEmployee.FullName;
-        dbEmployee.Salary = dtoEmployee.Salary;
-        dbEmployee.IdProfile = dtoEmployee.IdProfile;
-
-        _context.Employees.Update(dbEmployee);
-        await _context.SaveChangesAsync();
+        if (id != dtoEmployee.Id) return BadRequest("Id does not match!");
         
-        return Ok("Employee edited successfully!");
+        var employee = await _employeeService.Update(id, dtoEmployee);
+        if (employee is null) return NotFound("Employee not found!");
+        return Ok(employee);
     }
 
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult<EmployeeDTO>> Delete(int id)
     {
-        var dbEmployee = await _context.Employees.Where(e => e.Id == id).FirstOrDefaultAsync();
-        if (dbEmployee is null) return NotFound("Employee not found!");
-
-        _context.Employees.Remove(dbEmployee);
-        await _context.SaveChangesAsync();
-        
-        return Ok("Employee deleted successfully!");
+        var employee = await _employeeService.Delete(id);
+        if (!employee) return NotFound("Employee not found!");
+        return Ok();
     }
 }
