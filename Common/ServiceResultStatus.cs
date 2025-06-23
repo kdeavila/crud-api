@@ -4,5 +4,6 @@ public enum ServiceResultStatus
 {
     Success,
     NotFound,
-    InvalidInput
+    InvalidInput,
+    Conflict
 }
