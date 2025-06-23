@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace crud_api.Controllers;
 
-[Route("/[controller]")]
+[Route("/api/[controller]")]
 [ApiController]
 public class ProfileController(ProfileService profileService) : ControllerBase
 {
