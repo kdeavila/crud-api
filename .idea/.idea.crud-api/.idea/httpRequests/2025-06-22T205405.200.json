@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "Programador Junior"
+  },
+  {
+    "id": 2,
+    "name": "Programador Senior"
+  },
+  {
+    "id": 3,
+    "name": "Analista de Sistemas"
+  },
+  {
+    "id": 4,
+    "name": "Analista de Datos"
+  },
+  {
+    "id": 6,
+    "name": "Ing. de Software"
+  },
+  {
+    "id": 7,
+    "name": "Diseñador UX/UI"
+  },
+  {
+    "id": 8,
+    "name": "Gerente de Proyecto"
+  },
+  {
+    "id": 9,
+    "name": "Analista de Datos"
+  }
+]

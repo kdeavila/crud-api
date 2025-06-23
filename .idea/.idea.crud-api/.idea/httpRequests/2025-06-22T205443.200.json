@@ -1,0 +1,65 @@
+[
+  {
+    "id": 21,
+    "fullName": "Brian Mendez",
+    "salary": 150,
+    "idProfile": 4,
+    "nameProfile": "Analista de Datos"
+  },
+  {
+    "id": 22,
+    "fullName": "Keyner de Ávila",
+    "salary": 320,
+    "idProfile": 1,
+    "nameProfile": "Programador Junior"
+  },
+  {
+    "id": 24,
+    "fullName": "Paco Jazo",
+    "salary": 150,
+    "idProfile": 2,
+    "nameProfile": "Programador Senior"
+  },
+  {
+    "id": 30,
+    "fullName": "Juan Pérez",
+    "salary": 75000,
+    "idProfile": 1,
+    "nameProfile": "Programador Junior"
+  },
+  {
+    "id": 31,
+    "fullName": "María García",
+    "salary": 60000,
+    "idProfile": 2,
+    "nameProfile": "Programador Senior"
+  },
+  {
+    "id": 32,
+    "fullName": "Carlos López",
+    "salary": 80000,
+    "idProfile": 1,
+    "nameProfile": "Programador Junior"
+  },
+  {
+    "id": 33,
+    "fullName": "Ana Martínez",
+    "salary": 95000,
+    "idProfile": 3,
+    "nameProfile": "Analista de Sistemas"
+  },
+  {
+    "id": 34,
+    "fullName": "Pedro Sánchez",
+    "salary": 70000,
+    "idProfile": 4,
+    "nameProfile": "Analista de Datos"
+  },
+  {
+    "id": 35,
+    "fullName": "John Beltrán",
+    "salary": 120,
+    "idProfile": 2,
+    "nameProfile": "Programador Senior"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "id": 21,
+    "fullName": "Brian Mendez",
+    "salary": 150,
+    "idProfile": 4,
+    "nameProfile": "Analista de Datos"
+  },
+  {
+    "id": 22,
+    "fullName": "Keyner de ÁVila",
+    "salary": 320,
+    "idProfile": 1,
+    "nameProfile": "Programador Junior"
+  },
+  {
+    "id": 24,
+    "fullName": "Paco Jazo",
+    "salary": 150,
+    "idProfile": 2,
+    "nameProfile": "Programador Senior"
+  },
+  {
+    "id": 28,
+    "fullName": "Kenny",
+    "salary": 1200,
+    "idProfile": 3,
+    "nameProfile": "Analista de Sistemas"
+  }
+]
