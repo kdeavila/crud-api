@@ -8,7 +8,77 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cde5ece-7843-4621-b20f-08e39e0c9bcc" name="Changes" comment="" />
+    <list default="true" id="9cde5ece-7843-4621-b20f-08e39e0c9bcc" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources.local.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829/storage_v2/_src_/database/DbEmployee.bNWx8A.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829/storage_v2/_src_/database/DbEmployee.bNWx8A/schema/INFORMATION_SCHEMA.NBgcMw.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829/storage_v2/_src_/database/DbEmployee.bNWx8A/schema/dbo.sYMBAA.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829/storage_v2/_src_/database/DbEmployee.bNWx8A/schema/dbo.sYMBAA.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dataSources/763adcac-9cdd-42bb-9499-9a52955dd829/storage_v2/_src_/database/DbEmployee.bNWx8A/schema/sys.zb4BAA.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/dictionaries/project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015538.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015552.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015601.400.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015620.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015634.400.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015645.500.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015714.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015729.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015745.404.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015752.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015759.404.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015803.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015837.404.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015845.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T015900.404.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202141.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202151.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202158.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202203.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202213.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202224.404.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202229.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202237.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202531.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202539.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202548.400.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202601.400.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202617.400.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202626.500.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202639.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202650.400.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202659.500.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202726.400.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202735.500.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T202739.500.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205405.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205411.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205412.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205415.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205417.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205422.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205440.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205443.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205447.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/2025-06-22T205451.200.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/http-client.cookies" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/httpRequests/http-requests-log.http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/material_theme_project_new.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.crud-api/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250619051022_First_Migration.Designer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250619051022_First_Migration.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250621050238_Second Migration.Designer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250621050238_Second Migration.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250623011800_Third Migration.Designer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/20250623011800_Third Migration.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Migrations/AppDbContextModelSnapshot.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/crud-api.sln.DotSettings.user" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -155,7 +225,7 @@
       <workItem from="1750567303500" duration="8545000" />
       <workItem from="1750637759585" duration="1401000" />
       <workItem from="1750639970362" duration="4638000" />
-      <workItem from="1750652147873" duration="4713000" />
+      <workItem from="1750652147873" duration="5076000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <option name="closed" value="true" />
