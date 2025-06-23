@@ -8,5 +8,5 @@ public class Profile
     [Required]
     [MaxLength(100)]
     public required string Name { get; init; }
-    public virtual ICollection<Employee> EmployeesReference { get; set; }
+    public virtual ICollection<Employee>? EmployeesReference { get; set; }
 }

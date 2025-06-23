@@ -11,14 +11,14 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     private readonly EmployeeService _employeeService = employeeService;
 
     [HttpGet("getall")]
-    public async Task<ActionResult<List<EmployeeDTO>>> GetAll()
+    public async Task<ActionResult<List<EmployeeDto>>> GetAll()
     {
         var employees = await _employeeService.GetAll();
         return Ok(employees);
     }
 
     [HttpGet("getbyid/{id:int}")]
-    public async Task<ActionResult<EmployeeDTO>> GetById(int id)
+    public async Task<ActionResult<EmployeeDto>> GetById(int id)
     {
         var employee = await _employeeService.GetById(id);
         
@@ -27,7 +27,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<EmployeeDTO>> Create(EmployeeDTO dtoEmployee)
+    public async Task<ActionResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
     {
         var newEmployee = await _employeeService.Create(dtoEmployee);
 
@@ -40,7 +40,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     }
 
     [HttpPut("update/{id:int}")]
-    public async Task<ActionResult<EmployeeDTO>> Update(int id, [FromBody] EmployeeDTO dtoEmployee)
+    public async Task<ActionResult<EmployeeDto>> Update(int id, [FromBody] EmployeeDto dtoEmployee)
     {
         if (id != dtoEmployee.Id) return BadRequest("Id does not match!");
         
@@ -50,7 +50,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     }
 
     [HttpDelete("delete/{id:int}")]
-    public async Task<ActionResult<EmployeeDTO>> Delete(int id)
+    public async Task<ActionResult<EmployeeDto>> Delete(int id)
     {
         var employee = await _employeeService.Delete(id);
         if (!employee) return NotFound("Employee not found!");

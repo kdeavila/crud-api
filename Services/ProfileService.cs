@@ -8,14 +8,14 @@ public class ProfileService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<ProfileDTO>> List()
+    public async Task<List<ProfileDto>> List()
     {
-        var dtoList = new List<ProfileDTO>();
+        var dtoList = new List<ProfileDto>();
         var profiles = await _context.Profiles.ToListAsync();
 
         foreach (var p in profiles)
         {
-            dtoList.Add(new ProfileDTO
+            dtoList.Add(new ProfileDto
             {
                 Id = p.Id,
                 Name = p.Name,

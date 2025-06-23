@@ -21,13 +21,13 @@ Content-Type: application/json
 
 ###
 
-PUT {{crud-api-host}}/employee/update/28
+PUT {{crud-api-host}}/employee/update/35
 Content-Type: application/json
 
 {
-  "id": 28,
-  "FullName": "Nuevos cambios",
-  "Salary": 90,
+  "id": 35,
+  "FullName": "John Beltrán",
+  "Salary": 120,
   "IdProfile": 2
 }
 

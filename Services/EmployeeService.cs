@@ -9,11 +9,11 @@ public class EmployeeService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<EmployeeDTO>> GetAll()
+    public async Task<List<EmployeeDto>> GetAll()
     {
         var dtoList = await _context.Employees
             .Include(p => p.ProfileReference)
-            .Select(e => new EmployeeDTO
+            .Select(e => new EmployeeDto
             {
                 Id = e.Id,
                 FullName = e.FullName,
@@ -26,12 +26,12 @@ public class EmployeeService(AppDbContext context)
         return dtoList;
     }
 
-    public async Task<EmployeeDTO?> GetById(int id)
+    public async Task<EmployeeDto?> GetById(int id)
     {
         var dtoEmployee = await _context.Employees
             .Include(p => p.ProfileReference)
             .Where(e => e.Id == id)
-            .Select(e => new EmployeeDTO
+            .Select(e => new EmployeeDto
             {
                 Id = e.Id,
                 FullName = e.FullName,
@@ -44,7 +44,7 @@ public class EmployeeService(AppDbContext context)
         return dtoEmployee;
     }
 
-    public async Task<EmployeeDTO?> Create(EmployeeDTO dtoEmployee)
+    public async Task<EmployeeDto?> Create(EmployeeDto dtoEmployee)
     {
         if (string.IsNullOrEmpty(dtoEmployee.FullName)) return null;
         if (dtoEmployee.Salary < 0) return null;
@@ -64,7 +64,7 @@ public class EmployeeService(AppDbContext context)
         return createdEmployeeDto;
     }
 
-    public async Task<EmployeeDTO?> Update(int id, EmployeeDTO dtoEmployee)
+    public async Task<EmployeeDto?> Update(int id, EmployeeDto dtoEmployee)
     {
         if (string.IsNullOrEmpty(dtoEmployee.FullName)) return null;
         if (dtoEmployee.Salary < 0) return null;
