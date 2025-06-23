@@ -54,7 +54,7 @@ public class EmployeeService(AppDbContext context)
         {
             FullName = dtoEmployee.FullName,
             Salary = dtoEmployee.Salary,
-            IdProfile = dtoEmployee.IdProfile,
+            IdProfile = dtoEmployee.IdProfile
         };
         
         await _context.Employees.AddAsync(dbEmployee);
