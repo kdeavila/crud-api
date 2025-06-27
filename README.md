@@ -2,7 +2,7 @@
 
 ## ✨ Descripción del Proyecto
 
-Este proyecto es una demostración de una API Web robusta y bien estructurada, construida con **ASP.NET Core (.NET 9)** y **Entity Framework Core**, diseñada para la gestión de datos de empleados. El objetivo principal es mostrar la implementación de principios de **Clean Architecture**, una clara **separación de responsabilidades** entre capas (Controladores, Servicios, Entidades, DTOs) y una **validación de datos exhaustiva** en cada nivel.
+Este proyecto es una demostración de una API Web robusta y bien estructurada, construida con **ASP.NET Core (.NET 9)** y **Entity Framework Core**, diseñada para la gestión de datos de empleados y perfiles. El objetivo principal es mostrar la implementación de principios de **Clean Architecture**, una clara **separación de responsabilidades** entre capas (Controladores, Servicios, Entidades, DTOs) y una **validación de datos exhaustiva** en cada nivel.
 
 La API proporciona una base sólida para el desarrollo de aplicaciones backend escalables, mantenibles y fáciles de testear.
 
@@ -11,8 +11,8 @@ La API proporciona una base sólida para el desarrollo de aplicaciones backend e
 * **Arquitectura por Capas:** Separación clara entre la capa de presentación (Controladores), la lógica de negocio (Servicios) y el acceso a datos (Entidades, DbContext).
 * **Validación de Entrada Robusta:**
     * Utiliza `Data Annotations` en los DTOs para la validación automática del modelo.
-    * Implementa validaciones de reglas de negocio específicas dentro de la capa de Servicios (ej. verificar la existencia de claves foráneas).
-* **Respuestas API Explícitas:** Emplea objetos de resultado personalizados (`ServiceResultStatus`) desde la capa de servicio para habilitar respuestas HTTP precisas y significativas (ej. `200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`).
+    * Implementa validaciones de reglas de negocio específicas dentro de la capa de Servicios (ej. verificar la existencia de claves foráneas o unicidad de nombres).
+* **Respuestas API Explícitas:** Emplea objetos de resultado personalizados (`ServiceResultStatus`) desde la capa de servicio para habilitar respuestas HTTP precisas y significativas (ej. `200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`).
 * **Endpoints RESTful:** Adhiere a los principios RESTful para las operaciones CRUD (Crear, Leer, Actualizar, Borrar) de recursos.
 * **Eficiencia en Acceso a Datos:** Aprovecha Entity Framework Core para las interacciones con la base de datos, incluyendo carga anticipada (`.Include()`) y proyecciones eficientes a DTOs (`.Select()`).
 * **Integración con SQL Server:** Utiliza SQL Server como motor de base de datos relacional.
@@ -46,13 +46,13 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 2.  **Configura la Conexión a la Base de Datos:**
     * Abre el archivo `appsettings.json` en la raíz del proyecto.
     * Actualiza la cadena de conexión `DefaultConnection` para que apunte a tu instancia de SQL Server.
-        *Ejemplo (ajusta según tu configuración):*
+      *Ejemplo (ajusta según tu configuración):*
         ```json
         "ConnectionStrings": {
           "DefaultConnection": "Server=DESKTOP-M6D4FCH\\MSSQLSERVER01;Database=DbEmployee;Integrated Security=True;TrustServerCertificate=True"
         }
         ```
-        *(Asegúrate de que `TrustServerCertificate=True` esté presente si usas certificados auto-firmados o no validados en un entorno local).*
+      *(Asegúrate de que `TrustServerCertificate=True` esté presente si usas certificados auto-firmados o no validados en un entorno local).*
 
 3.  **Aplica las Migraciones de la Base de Datos:**
     * Abre una terminal en la raíz del proyecto (donde se encuentra `crud-api.csproj`).
@@ -73,8 +73,6 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 4.  Puedes usar herramientas como Postman, Insomnia o un navegador web para interactuar con la API.
 
 ## 🌐 Endpoints de la API
-
-*(Actualmente implementados para la gestión de Empleados. Próximamente se añadirán los de Perfiles.)*
 
 ### 🧑‍💻 Empleados (`/Employee`)
 
@@ -135,12 +133,12 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
             "nameProfile": "Ingeniero QA"
         }
         ```
-        *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/Employee/getbyid/16`*
+      *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/Employee/getbyid/16`*
 
 * **`PUT /Employee/{id}`**
     * **Descripción:** Actualiza un empleado existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición.
     * **Cuerpo de la Petición (`EmployeeDto`):**
-        *Ejemplo para actualizar el empleado con ID 1:*
+      *Ejemplo para actualizar el empleado con ID 1:*
         ```json
         {
             "id": 1,
@@ -166,9 +164,94 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
     * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el empleado no existe)
     * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
 
+### 👥 Perfiles (`/Profile`)
+
+* **`GET /Profile/getall`**
+    * **Descripción:** Recupera una lista de todos los perfiles.
+    * **Código de Respuesta:** `200 OK`
+    * **Ejemplo de Respuesta:**
+        ```json
+        [
+            {
+                "id": 1,
+                "name": "Desarrollador Frontend"
+            },
+            {
+                "id": 2,
+                "name": "Desarrollador Backend"
+            }
+            // ... más perfiles
+        ]
+        ```
+
+* **`GET /Profile/getbyid/{id}`**
+    * **Descripción:** Recupera un único perfil por su ID.
+    * **Código de Respuesta:** `200 OK` (si se encuentra), `404 Not Found` (si no se encuentra)
+    * **Ejemplo de Petición (para ID 1):** `GET /Profile/getbyid/1`
+    * **Ejemplo de Respuesta (200 OK):**
+        ```json
+        {
+            "id": 1,
+            "name": "Desarrollador Frontend"
+        }
+        ```
+    * **Ejemplo de Respuesta (404 Not Found):**
+        ```json
+        "Profile not found!"
+        ```
+
+* **`POST /Profile/create`**
+    * **Descripción:** Crea un nuevo perfil.
+    * **Cuerpo de la Petición (`ProfileDto`):**
+        ```json
+        {
+            "name": "Nuevo Perfil"
+        }
+        ```
+    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (errores de validación), `409 Conflict` (si el nombre ya existe)
+    * **Ejemplo de Respuesta (201 Created):**
+        ```json
+        {
+            "id": 5, // ID generado automáticamente
+            "name": "Nuevo Perfil"
+        }
+        ```
+      *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/api/Profile/getbyid/5`*
+    * **Ejemplo de Respuesta (409 Conflict):**
+        ```json
+        "Profile with name 'Nuevo Perfil' already exists."
+        ```
+
+* **`PUT /Profile/update/{id}`**
+    * **Descripción:** Actualiza un perfil existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición.
+    * **Cuerpo de la Petición (`ProfileDto`):**
+      *Ejemplo para actualizar el perfil con ID 1:*
+        ```json
+        {
+            "id": 1,
+            "name": "Desarrollador Frontend Actualizado"
+        }
+        ```
+    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden), `404 Not Found` (si el perfil no existe), `409 Conflict` (si el nuevo nombre ya existe para otro perfil)
+    * **Ejemplo de Respuesta (200 OK):**
+        ```json
+        {
+            "id": 1,
+            "name": "Desarrollador Frontend Actualizado"
+        }
+        ```
+    * **Ejemplo de Respuesta (409 Conflict):**
+        ```json
+        "Profile with name 'Desarrollador Backend' already exists for another profile."
+        ```
+
+* **`DELETE /Profile/delete/{id}`**
+    * **Descripción:** Elimina un perfil por su ID.
+    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el perfil no existe)
+    * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
+
 ## 🌟 Próximas Mejoras
 
-* Implementación completa de las operaciones CRUD para la entidad **`Profile`**.
 * Añadir autenticación y autorización.
 * Implementar paginación y filtrado más avanzado para los endpoints GET.
 * Mejoras en el registro (logging) y manejo de errores.
