@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Profile> Profiles { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,5 +33,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             table.HasOne(col => col.ProfileReference).WithMany(p => p.EmployeesReference).HasForeignKey(col => col.IdProfile);
             table.ToTable("Employee");
         });
+        
+        modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
     }
 }
