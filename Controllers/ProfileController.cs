@@ -1,6 +1,7 @@
 using crud_api.Common;
 using crud_api.DTOs;
 using crud_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace crud_api.Controllers;
@@ -26,6 +27,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
         return Ok(profile);
     }
 
+    [Authorize]
     [HttpPost("create")]
     public async Task<ActionResult<ProfileDto>> Create(ProfileDto dtoProfile)
     {
@@ -42,6 +44,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
         };
     }
 
+    [Authorize]
     [HttpPut("update/{id:int}")]
     public async Task<ActionResult<ProfileDto>> Update(int id, [FromBody] ProfileDto dtoProfile)
     {
@@ -58,6 +61,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
         };
     }
 
+    [Authorize]
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

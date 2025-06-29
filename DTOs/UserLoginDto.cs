@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace crud_api.DTOS;
+namespace crud_api.DTOs;
 
 public class UserLoginDto
 {

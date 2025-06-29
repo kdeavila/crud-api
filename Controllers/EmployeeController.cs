@@ -1,6 +1,7 @@
 using crud_api.Common;
 using crud_api.DTOS;
 using crud_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace crud_api.Controllers;
@@ -27,6 +28,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         return Ok(employee);
     }
 
+    [Authorize]
     [HttpPost("create")]
     public async Task<ActionResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
     {
@@ -42,6 +44,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         };
     }
 
+    [Authorize]
     [HttpPut("update/{id:int}")]
     public async Task<ActionResult<EmployeeDto>> Update(int id, [FromBody] EmployeeDto dtoEmployee)
     {
@@ -60,6 +63,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         };
     }
 
+    [Authorize]
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

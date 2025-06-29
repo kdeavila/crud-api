@@ -46,6 +46,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
 
