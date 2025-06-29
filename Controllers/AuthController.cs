@@ -1,6 +1,7 @@
 using crud_api.Common;
 using crud_api.DTOs;
 using crud_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace crud_api.Controllers;
@@ -30,6 +31,7 @@ public class AuthController(AuthService authService) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
     {

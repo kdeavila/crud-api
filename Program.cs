@@ -1,5 +1,7 @@
 using System.Text;
+using crud_api.Common;
 using crud_api.Context;
+using crud_api.Entities;
 using crud_api.Services;
 using crud_api.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -54,6 +56,24 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<AppDbContext>();
+
+        if (!context.Users.Any(u => u.Role == UserRole.Admin))
+        {
+            var newAdmin = new User
+            {
+                Email = "admin@example.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("adminexample123!"),
+                Role = UserRole.Admin
+            };
+            context.Users.Add(newAdmin);
+            context.SaveChanges();
+        }
+    }
 }
 
 app.UseHttpsRedirection();

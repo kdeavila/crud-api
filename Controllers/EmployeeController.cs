@@ -13,12 +13,14 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     private readonly EmployeeService _employeeService = employeeService;
 
     [HttpGet("getall")]
+    [Authorize(Roles = "Admin, Editor, Viewer")]
     public async Task<ActionResult<List<EmployeeDto>>> GetAll()
     {
         var employees = await _employeeService.GetAll();
         return Ok(employees);
     }
 
+    [Authorize(Roles = "Admin, Editor, Viewer")]
     [HttpGet("getbyid/{id:int}")]
     public async Task<ActionResult<EmployeeDto>> GetById(int id)
     {
@@ -28,7 +30,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         return Ok(employee);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin, Editor")]
     [HttpPost("create")]
     public async Task<ActionResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
     {
@@ -44,7 +46,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         };
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin, Editor")]
     [HttpPut("update/{id:int}")]
     public async Task<ActionResult<EmployeeDto>> Update(int id, [FromBody] EmployeeDto dtoEmployee)
     {
@@ -63,7 +65,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
         };
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin, Editor")]
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {

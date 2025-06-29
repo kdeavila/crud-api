@@ -13,6 +13,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
     private readonly ProfileService _profileService = profileService;
 
     [HttpGet("getall")]
+    [Authorize(Roles = "Admin, Editor, Viewer")]
     public async Task<ActionResult<List<ProfileDto>>> GetAll()
     {
         var profiles = await _profileService.List();
@@ -20,6 +21,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
     }
 
     [HttpGet("getbyid/{id:int}")]
+    [Authorize(Roles = "Admin, Editor, Viewer")]
     public async Task<ActionResult<ProfileDto>> GetById(int id)
     {
         var profile = await _profileService.GetById(id);
@@ -27,8 +29,8 @@ public class ProfileController(ProfileService profileService) : ControllerBase
         return Ok(profile);
     }
 
-    [Authorize]
     [HttpPost("create")]
+    [Authorize(Roles = "Admin, Editor")]
     public async Task<ActionResult<ProfileDto>> Create(ProfileDto dtoProfile)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -43,8 +45,8 @@ public class ProfileController(ProfileService profileService) : ControllerBase
             _ => StatusCode(500, "There was an error creating the profile.")
         };
     }
-
-    [Authorize]
+    
+    [Authorize(Roles = "Admin, Editor")]
     [HttpPut("update/{id:int}")]
     public async Task<ActionResult<ProfileDto>> Update(int id, [FromBody] ProfileDto dtoProfile)
     {
@@ -61,7 +63,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
         };
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin, Editor")]
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {
