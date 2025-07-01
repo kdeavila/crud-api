@@ -1,6 +1,6 @@
 using crud_api.Common;
 using crud_api.Context;
-using crud_api.DTOS;
+using crud_api.DTOs;
 using crud_api.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +10,76 @@ public class EmployeeService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<EmployeeDto>> GetAll()
+    public async Task<List<EmployeeDto>> GetAllPaginatedAndFiltered(EmployeeQueryParamsDto employeeQueryParamsDto)
     {
-        var dtoList = await _context.Employees
-            .Include(p => p.ProfileReference)
+        var query = _context.Employees.AsQueryable();
+        query = query.Include(e => e.ProfileReference);
+
+        if (!string.IsNullOrEmpty(employeeQueryParamsDto.FullName))
+        {
+            query = query.Where(e => e.FullName.Contains(employeeQueryParamsDto.FullName));
+        }
+
+        if (employeeQueryParamsDto.IdProfile.HasValue)
+        {
+            query = query.Where(e => e.IdProfile == employeeQueryParamsDto.IdProfile);
+        }
+
+        if (employeeQueryParamsDto.MinSalary.HasValue)
+        {
+            query = query.Where(e => e.Salary >= employeeQueryParamsDto.MinSalary);
+        }
+
+        if (employeeQueryParamsDto.MaxSalary.HasValue)
+        {
+            query = query.Where(e => e.Salary <= employeeQueryParamsDto.MaxSalary);
+        }
+
+        var sortByLower = employeeQueryParamsDto.SortBy?.ToLower();
+        var orderLower = employeeQueryParamsDto.Order?.ToLower();
+
+        switch (sortByLower)
+        {
+            case "fullname":
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(e => e.FullName)
+                    : query.OrderBy(e => e.FullName);
+                break;
+            case "salary":
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(e => e.Salary)
+                    : query.OrderBy(e => e.Salary);
+                break;
+            case "profile":
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(e => e.ProfileReference!.Name)
+                    : query.OrderBy(e => e.ProfileReference!.Name);
+                break;
+            case "id":
+            default:
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(e => e.Id)
+                    : query.OrderBy(e => e.Id);
+                break;
+        }
+
+        query = employeeQueryParamsDto.SortBy switch
+        {
+            "id" => query.OrderBy(e => e.Id),
+            "fullname" => query.OrderBy(e => e.FullName),
+            "salary" => query.OrderBy(e => e.Salary),
+            "profile" => query.OrderBy(e => e.ProfileReference!.Name),
+            _ => query.OrderBy(e => e.Id)
+        };
+
+        query = employeeQueryParamsDto.Order switch
+        {
+            "asc" => query.OrderBy(e => e.FullName),
+            "desc" => query.OrderByDescending(e => e.FullName),
+            _ => query.OrderBy(e => e.FullName)
+        };
+
+        var dtoList = await query
             .Select(e => new EmployeeDto
             {
                 Id = e.Id,
@@ -116,7 +182,7 @@ public class EmployeeService(AppDbContext context)
         dbEmployee.IdProfile = dtoEmployee.IdProfile;
 
         await _context.SaveChangesAsync();
-        
+
         var updatedEmployeeDto = await GetById(dbEmployee.Id);
         if (updatedEmployeeDto is null)
         {

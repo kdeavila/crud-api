@@ -1,4 +1,4 @@
-using crud_api.DTOS;
+using crud_api.DTOs;
 
 namespace crud_api.Common;
 

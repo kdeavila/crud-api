@@ -1,5 +1,5 @@
 using crud_api.Common;
-using crud_api.DTOS;
+using crud_api.DTOs;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +14,11 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
 
     [HttpGet("getall")]
     [Authorize(Roles = "Admin, Editor, Viewer")]
-    public async Task<ActionResult<List<EmployeeDto>>> GetAll()
+    public async Task<ActionResult<List<EmployeeDto>>> GetAll([FromQuery] EmployeeQueryParamsDto employeeQueryParamsDto)
     {
-        var employees = await _employeeService.GetAll();
+        var employees = await _employeeService.GetAllPaginatedAndFiltered(employeeQueryParamsDto);
         return Ok(employees);
-    }
+    }   
 
     [Authorize(Roles = "Admin, Editor, Viewer")]
     [HttpGet("getbyid/{id:int}")]
