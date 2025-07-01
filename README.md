@@ -1,4 +1,4 @@
-# CRUD API de Gestión de Empleados con .NET 9 y SQL Server
+# CRUD API con .NET 9 y SQL Server
 
 ## ✨ Descripción del Proyecto
 
@@ -17,12 +17,20 @@ La API proporciona una base sólida para el desarrollo de aplicaciones backend e
 * **Eficiencia en Acceso a Datos:** Aprovecha Entity Framework Core para las interacciones con la base de datos, incluyendo carga anticipada (`.Include()`) y proyecciones eficientes a DTOs (`.Select()`).
 * **Integración con SQL Server:** Utiliza SQL Server como motor de base de datos relacional.
 
+## 🔑 Seguridad y Autenticación
+
+* **Autenticación Basada en Tokens JWT:** Implementación de un flujo de autenticación seguro utilizando JSON Web Tokens (JWT) para verificar la identidad del usuario. Los nombres de los roles se manejan como strings para mayor legibilidad de la API.
+* **Gestión Segura de Contraseñas:** Las contraseñas de los usuarios se almacenan de forma segura utilizando el algoritmo de hashing adaptativo **BCrypt**, que incluye salting automático para proteger contra ataques de fuerza bruta y tablas arcoíris.
+* **Autorización Basada en Roles (RBAC):** Control de acceso granular a los endpoints de la API mediante roles de usuario definidos (`Admin`, `Manager`, `Viewer`). Los roles se asignan durante el registro y se validan con el atributo `[Authorize(Roles = "")]` en los controladores y métodos de acción.
+* **Validación de Roles Robusta:** Se utiliza una validación personalizada en los DTOs para asegurar que los valores de rol proporcionados en las solicitudes correspondan a roles válidos y definidos en el sistema.
+
 ## 🛠️ Tecnologías Utilizadas
 
 * **.NET 9**
 * **ASP.NET Core Web API**
 * **Entity Framework Core**
 * **SQL Server**
+* **BCrypt.Net-Core** (para hashing de contraseñas)
 * **DBeaver** (o SQL Server Management Studio para gestión de BD)
 
 ## ▶️ Cómo Empezar
@@ -74,10 +82,45 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 
 ## 🌐 Endpoints de la API
 
+### 🔐 Autenticación (`/Auth`)
+
+* **`POST /Auth/login`**
+    * **Descripción:** Autentica a un usuario y devuelve un JSON Web Token (JWT) si las credenciales son válidas.
+    * **Cuerpo de la Petición (`UserLoginDto`):**
+        ```json
+        {
+          "email": "usuario@ejemplo.com",
+          "password": "miContrasenaSegura123"
+        }
+        ```
+    * **Códigos de Respuesta:** `200 OK` (con JWT), `400 Bad Request` (datos de entrada inválidos), `404 Not Found` (usuario no encontrado o credenciales inválidas).
+    * **Ejemplo de Respuesta (200 OK):**
+        ```json
+        {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvQGVqZW1wbG8uY29tIiwianRpIjoiZmRlY..."
+        }
+        ```
+
+* **`POST /Auth/register`**
+    * **Descripción:** Registra un nuevo usuario en el sistema. Protegido por el rol `Admin`.
+    * **Cuerpo de la Petición (`UserRegisterDto`):**
+        ```json
+        {
+          "email": "nuevo.usuario@ejemplo.com",
+          "password": "otraContrasenaSegura456!",
+          "role": "Viewer" // O "Manager", "Admin"
+        }
+        ```
+    * **Códigos de Respuesta:** `200 OK`, `400 Bad Request` (errores de validación, rol inválido), `409 Conflict` (usuario ya existe), `401 Unauthorized` (si no es Admin).
+    * **Ejemplo de Respuesta (200 OK):**
+        ```json
+        "Registration successful"
+        ```
+
 ### 🧑‍💻 Empleados (`/Employee`)
 
 * **`GET /Employee/getall`**
-    * **Descripción:** Recupera una lista de todos los empleados.
+    * **Descripción:** Recupera una lista de todos los empleados. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
     * **Código de Respuesta:** `200 OK`
     * **Ejemplo de Respuesta:**
         ```json
@@ -94,7 +137,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`GET /Employee/getbyid/{id}`**
-    * **Descripción:** Recupera un único empleado por su ID.
+    * **Descripción:** Recupera un único empleado por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
     * **Código de Respuesta:** `200 OK` (si se encuentra), `404 Not Found` (si no se encuentra)
     * **Ejemplo de Petición (para ID 1):** `GET /Employee/getbyid/1`
     * **Ejemplo de Respuesta (200 OK):**
@@ -113,7 +156,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`POST /Employee`**
-    * **Descripción:** Crea un nuevo empleado.
+    * **Descripción:** Crea un nuevo empleado. Requiere autenticación con rol `Admin` o `Manager`.
     * **Cuerpo de la Petición (`EmployeeDto`):**
         ```json
         {
@@ -122,7 +165,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
             "idProfile": 3
         }
         ```
-    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (por errores de validación o `IdProfile` inválido)
+    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (por errores de validación o `IdProfile` inválido), `401 Unauthorized`.
     * **Ejemplo de Respuesta (201 Created):**
         ```json
         {
@@ -136,7 +179,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
       *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/Employee/getbyid/16`*
 
 * **`PUT /Employee/{id}`**
-    * **Descripción:** Actualiza un empleado existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición.
+    * **Descripción:** Actualiza un empleado existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición. Requiere autenticación con rol `Admin` o `Manager`.
     * **Cuerpo de la Petición (`EmployeeDto`):**
       *Ejemplo para actualizar el empleado con ID 1:*
         ```json
@@ -147,7 +190,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
             "idProfile": 1
         }
         ```
-    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden o `IdProfile` inválido), `404 Not Found` (si el empleado no existe)
+    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden o `IdProfile` inválido), `404 Not Found` (si el empleado no existe), `401 Unauthorized`.
     * **Ejemplo de Respuesta (200 OK):**
         ```json
         {
@@ -160,14 +203,14 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`DELETE /Employee/{id}`**
-    * **Descripción:** Elimina un empleado por su ID.
-    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el empleado no existe)
+    * **Descripción:** Elimina un empleado por su ID. Requiere autenticación con rol `Admin` o `Manager`.
+    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el empleado no existe), `401 Unauthorized`.
     * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
 
 ### 👥 Perfiles (`/Profile`)
 
 * **`GET /Profile/getall`**
-    * **Descripción:** Recupera una lista de todos los perfiles.
+    * **Descripción:** Recupera una lista de todos los perfiles. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
     * **Código de Respuesta:** `200 OK`
     * **Ejemplo de Respuesta:**
         ```json
@@ -185,7 +228,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`GET /Profile/getbyid/{id}`**
-    * **Descripción:** Recupera un único perfil por su ID.
+    * **Descripción:** Recupera un único perfil por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
     * **Código de Respuesta:** `200 OK` (si se encuentra), `404 Not Found` (si no se encuentra)
     * **Ejemplo de Petición (para ID 1):** `GET /Profile/getbyid/1`
     * **Ejemplo de Respuesta (200 OK):**
@@ -201,14 +244,14 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`POST /Profile/create`**
-    * **Descripción:** Crea un nuevo perfil.
+    * **Descripción:** Crea un nuevo perfil. Requiere autenticación con rol `Admin` o `Manager`.
     * **Cuerpo de la Petición (`ProfileDto`):**
         ```json
         {
             "name": "Nuevo Perfil"
         }
         ```
-    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (errores de validación), `409 Conflict` (si el nombre ya existe)
+    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (errores de validación), `409 Conflict` (si el nombre ya existe), `401 Unauthorized`.
     * **Ejemplo de Respuesta (201 Created):**
         ```json
         {
@@ -223,7 +266,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`PUT /Profile/update/{id}`**
-    * **Descripción:** Actualiza un perfil existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición.
+    * **Descripción:** Actualiza un perfil existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición. Requiere autenticación con rol `Admin` o `Manager`.
     * **Cuerpo de la Petición (`ProfileDto`):**
       *Ejemplo para actualizar el perfil con ID 1:*
         ```json
@@ -232,7 +275,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
             "name": "Desarrollador Frontend Actualizado"
         }
         ```
-    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden), `404 Not Found` (si el perfil no existe), `409 Conflict` (si el nuevo nombre ya existe para otro perfil)
+    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden), `404 Not Found` (si el perfil no existe), `409 Conflict` (si el nuevo nombre ya existe para otro perfil), `401 Unauthorized`.
     * **Ejemplo de Respuesta (200 OK):**
         ```json
         {
@@ -246,17 +289,17 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
         ```
 
 * **`DELETE /Profile/delete/{id}`**
-    * **Descripción:** Elimina un perfil por su ID.
-    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el perfil no existe)
+    * **Descripción:** Elimina un perfil por su ID. Requiere autenticación con rol `Admin` o `Manager`.
+    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el perfil no existe), `401 Unauthorized`.
     * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
 
 ## 🌟 Próximas Mejoras
 
-* Añadir autenticación y autorización.
 * Implementar paginación y filtrado más avanzado para los endpoints GET.
 * Mejoras en el registro (logging) y manejo de errores.
 * Implementación de pruebas unitarias y de integración.
 * Documentación de API con Swagger/OpenAPI.
+* **Gestión de Usuarios (para administradores):** Crear endpoints para que los usuarios con rol 'Admin' puedan listar, ver, editar y eliminar otras cuentas de usuario.
 
 ## 📝 Autoría
 
