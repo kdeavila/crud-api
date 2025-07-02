@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace crud_api.DTOs;
+namespace crud_api.DTOs.Profile;
 
 public class ProfileDto
 {

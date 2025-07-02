@@ -1,6 +1,6 @@
 using crud_api.Common;
 
-namespace crud_api.DTOs;
+namespace crud_api.DTOs.Common;
 
 public class PaginatedResultDto<T>
 {

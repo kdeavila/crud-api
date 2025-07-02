@@ -1,6 +1,7 @@
 using crud_api.Common;
+using crud_api.DTOs.Common;
 
-namespace crud_api.DTOs;
+namespace crud_api.DTOs.User;
 
 public class UserQueryParamsDto
 {

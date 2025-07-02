@@ -1,4 +1,6 @@
-namespace crud_api.DTOs;
+using crud_api.DTOs.Common;
+
+namespace crud_api.DTOs.Profile;
 
 public class ProfileQueryParams
 {

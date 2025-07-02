@@ -1,5 +1,5 @@
 using crud_api.Common;
-using crud_api.DTOs;
+using crud_api.DTOs.User;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

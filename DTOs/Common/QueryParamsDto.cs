@@ -1,4 +1,4 @@
-namespace crud_api.DTOs;
+namespace crud_api.DTOs.Common;
 
 public class QueryParamsDto
 {

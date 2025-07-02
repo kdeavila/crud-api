@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using crud_api.Common;
 using crud_api.Context;
-using crud_api.DTOs;
+using crud_api.DTOs.Auth;
 using crud_api.Entities;
 using crud_api.Settings;
 using Microsoft.EntityFrameworkCore;
