@@ -36,8 +36,8 @@ public class EmployeeService(AppDbContext context)
             query = query.Where(e => e.Salary <= employeeQueryParamsDto.MaxSalary);
         }
 
-        var sortByLower = employeeQueryParamsDto.SortBy?.ToLower();
-        var orderLower = employeeQueryParamsDto.Order?.ToLower();
+        var sortByLower = employeeQueryParamsDto.QueryParams.SortBy?.ToLower();
+        var orderLower = employeeQueryParamsDto.QueryParams.Order?.ToLower();
 
         switch (sortByLower)
         {
@@ -67,8 +67,8 @@ public class EmployeeService(AppDbContext context)
         var totalCount = await query.CountAsync();
 
         query = query
-            .Skip((employeeQueryParamsDto.PageNumber - 1) * employeeQueryParamsDto.PageSize)
-            .Take(employeeQueryParamsDto.PageSize);
+            .Skip((employeeQueryParamsDto.QueryParams.PageNumber - 1) * employeeQueryParamsDto.QueryParams.PageSize)
+            .Take(employeeQueryParamsDto.QueryParams.PageSize);
 
         var paginatedEmployees = await query
             .Select(e => new EmployeeDto
@@ -85,8 +85,8 @@ public class EmployeeService(AppDbContext context)
         {
             Data = paginatedEmployees,
             TotalCount = totalCount,
-            PageNumber = employeeQueryParamsDto.PageNumber,
-            PageSize = employeeQueryParamsDto.PageSize
+            PageNumber = employeeQueryParamsDto.QueryParams.PageNumber,
+            PageSize = employeeQueryParamsDto.QueryParams.PageSize
         };
 
         var result = new ServiceResult<PaginatedResultDto<EmployeeDto>>

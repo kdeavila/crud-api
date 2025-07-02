@@ -8,7 +8,7 @@ public class Employee
     [Required]
     [MaxLength(100)]
     public required string FullName { get; set; }
-    public int Salary { get; set; }
+    public decimal Salary { get; set; }
     public int IdProfile  { get; set; }
     public virtual Profile? ProfileReference { get; init; }
 }

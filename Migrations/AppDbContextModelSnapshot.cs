@@ -37,8 +37,8 @@ namespace crud_api.Migrations
                     b.Property<int>("IdProfile")
                         .HasColumnType("int");
 
-                    b.Property<int>("Salary")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
