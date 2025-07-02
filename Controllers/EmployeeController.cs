@@ -18,7 +18,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     {
         var employees = await _employeeService.GetAllPaginatedAndFiltered(employeeQueryParamsDto);
         return Ok(employees);
-    }   
+    }
 
     [Authorize(Roles = "Admin, Editor, Viewer")]
     [HttpGet("getbyid/{id:int}")]

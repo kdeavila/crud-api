@@ -10,7 +10,8 @@ public class EmployeeService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<EmployeeDto>> GetAllPaginatedAndFiltered(EmployeeQueryParamsDto employeeQueryParamsDto)
+    public async Task<PaginatedResultDto<EmployeeDto>> GetAllPaginatedAndFiltered(
+        EmployeeQueryParamsDto employeeQueryParamsDto)
     {
         var query = _context.Employees.AsQueryable();
         query = query.Include(e => e.ProfileReference);
@@ -63,34 +64,32 @@ public class EmployeeService(AppDbContext context)
                 break;
         }
 
-        query = employeeQueryParamsDto.SortBy switch
-        {
-            "id" => query.OrderBy(e => e.Id),
-            "fullname" => query.OrderBy(e => e.FullName),
-            "salary" => query.OrderBy(e => e.Salary),
-            "profile" => query.OrderBy(e => e.ProfileReference!.Name),
-            _ => query.OrderBy(e => e.Id)
-        };
+        int totalCount = await query.CountAsync();
 
-        query = employeeQueryParamsDto.Order switch
-        {
-            "asc" => query.OrderBy(e => e.FullName),
-            "desc" => query.OrderByDescending(e => e.FullName),
-            _ => query.OrderBy(e => e.FullName)
-        };
+        query = query
+            .Skip((employeeQueryParamsDto.PageNumber - 1) * employeeQueryParamsDto.PageSize)
+            .Take(employeeQueryParamsDto.PageSize);
 
-        var dtoList = await query
+        var paginatedEmployees = await query
             .Select(e => new EmployeeDto
             {
                 Id = e.Id,
                 FullName = e.FullName,
                 Salary = e.Salary,
                 IdProfile = e.IdProfile,
-                NameProfile = e.ProfileReference!.Name,
+                NameProfile = e.ProfileReference!.Name
             })
             .ToListAsync();
 
-        return dtoList;
+        var result = new PaginatedResultDto<EmployeeDto>
+        {
+            Data = paginatedEmployees,
+            TotalCount = totalCount,
+            PageNumber = employeeQueryParamsDto.PageNumber,
+            PageSize = employeeQueryParamsDto.PageSize
+        };
+
+        return result;
     }
 
     public async Task<EmployeeDto?> GetById(int id)
