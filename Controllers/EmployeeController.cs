@@ -14,7 +14,8 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
 
     [HttpGet("getall")]
     [Authorize(Roles = "Admin, Editor, Viewer")]
-    public async Task<ActionResult<List<EmployeeDto>>> GetAll([FromQuery] EmployeeQueryParamsDto employeeQueryParamsDto)
+    public async Task<ActionResult<List<EmployeeGetDto>>> GetAll(
+        [FromQuery] EmployeeQueryParamsDto employeeQueryParamsDto)
     {
         var result = await _employeeService.GetAllPaginatedAndFiltered(employeeQueryParamsDto);
 
@@ -25,24 +26,28 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
             _ => StatusCode(500, "There was an error getting all employees.")
         };
     }
-    
+
     [Authorize(Roles = "Admin, Editor, Viewer")]
     [HttpGet("getbyid/{id:int}")]
-    public async Task<ActionResult<EmployeeDto>> GetById(int id)
+    public async Task<ActionResult<EmployeeGetDto>> GetById(int id)
     {
-        var employee = await _employeeService.GetById(id);
+        var result = await _employeeService.GetById(id);
 
-        if (employee is null) return NotFound("Employee not found!");
-        return Ok(employee);
+        return result.Status switch
+        {
+            ServiceResultStatus.Success => Ok(result.Data),
+            ServiceResultStatus.NotFound => NotFound(result.Message),
+            _ => StatusCode(500, "There was an error getting the employee.")
+        };
     }
 
     [Authorize(Roles = "Admin, Editor")]
     [HttpPost("create")]
-    public async Task<ActionResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
+    public async Task<ActionResult<EmployeeGetDto>> Create(EmployeeCreateDto employeeCreateDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var result = await _employeeService.Create(dtoEmployee);
+        var result = await _employeeService.Create(employeeCreateDto);
 
         return result.Status switch
         {
@@ -54,13 +59,12 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
 
     [Authorize(Roles = "Admin, Editor")]
     [HttpPut("update/{id:int}")]
-    public async Task<ActionResult<EmployeeDto>> Update(int id, [FromBody] EmployeeDto dtoEmployee)
+    public async Task<ActionResult<EmployeeGetDto>> Update(int id, [FromBody] EmployeeUpdateDto employeeUpdateDto)
     {
-        if (id != dtoEmployee.Id) return BadRequest("Id does not match with Id in body data.");
-
+        if (id != employeeUpdateDto.Id) return BadRequest("Id does not match with Id in body data.");
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var result = await _employeeService.Update(id, dtoEmployee);
+        var result = await _employeeService.Update(id, employeeUpdateDto);
 
         return result.Status switch
         {
@@ -75,8 +79,13 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     [HttpDelete("delete/{id:int}")]
     public async Task<ActionResult> Delete(int id)
     {
-        var employee = await _employeeService.Delete(id);
-        if (!employee) return NotFound($"Employee with id {id} not found!");
-        return NoContent();
+        var result = await _employeeService.Delete(id);
+
+        return result.Status switch
+        {
+            ServiceResultStatus.Success => NoContent(),
+            ServiceResultStatus.NotFound => NotFound(result.Message),
+            _ => StatusCode(500, "There was an error deleting the employee.")
+        };
     }
 }

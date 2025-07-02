@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace crud_api.DTOs.Employee;
 
-public class EmployeeDto
+public class EmployeeCreateDto
 {
-    public int Id { get; set; }
-
     [Required(ErrorMessage = "Name is required")]
     [StringLength(100, ErrorMessage = "The name must be maximum 100 characters")]
     public required string FullName { get; set; }
@@ -15,6 +13,4 @@ public class EmployeeDto
 
     [Required(ErrorMessage = "IdProfile is required")]
     public int IdProfile { get; set; }
-
-    public string? NameProfile { get; set; }
 }

@@ -11,7 +11,7 @@ public class EmployeeService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<ServiceResult<PaginatedResultDto<EmployeeDto>>> GetAllPaginatedAndFiltered(
+    public async Task<ServiceResult<PaginatedResultDto<EmployeeGetDto>>> GetAllPaginatedAndFiltered(
         EmployeeQueryParamsDto employeeQueryParamsDto)
     {
         var query = _context.Employees.AsQueryable();
@@ -72,7 +72,7 @@ public class EmployeeService(AppDbContext context)
             .Take(employeeQueryParamsDto.QueryParams.PageSize);
 
         var paginatedEmployees = await query
-            .Select(e => new EmployeeDto
+            .Select(e => new EmployeeGetDto
             {
                 Id = e.Id,
                 FullName = e.FullName,
@@ -82,7 +82,7 @@ public class EmployeeService(AppDbContext context)
             })
             .ToListAsync();
 
-        var paginatedResult = new PaginatedResultDto<EmployeeDto>
+        var paginatedResult = new PaginatedResultDto<EmployeeGetDto>
         {
             Data = paginatedEmployees,
             TotalCount = totalCount,
@@ -90,21 +90,21 @@ public class EmployeeService(AppDbContext context)
             PageSize = employeeQueryParamsDto.QueryParams.PageSize
         };
 
-        var result = new ServiceResult<PaginatedResultDto<EmployeeDto>>
+        var result = new ServiceResult<PaginatedResultDto<EmployeeGetDto>>
         {
             Data = paginatedResult,
             Status = ServiceResultStatus.Success
         };
-        
+
         return result;
     }
 
-    public async Task<EmployeeDto?> GetById(int id)
+    public async Task<ServiceResult<EmployeeGetDto>> GetById(int id)
     {
-        var dtoEmployee = await _context.Employees
+        var employeeDto = await _context.Employees
             .Include(p => p.ProfileReference)
             .Where(e => e.Id == id)
-            .Select(e => new EmployeeDto
+            .Select(e => new EmployeeGetDto
             {
                 Id = e.Id,
                 FullName = e.FullName,
@@ -114,60 +114,78 @@ public class EmployeeService(AppDbContext context)
             })
             .FirstOrDefaultAsync();
 
-        return dtoEmployee;
+        if (employeeDto is null)
+        {
+            return new ServiceResult<EmployeeGetDto>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"Employee with id {id} not found"
+            };
+        }
+
+        return new ServiceResult<EmployeeGetDto>
+        {
+            Status = ServiceResultStatus.Success,
+            Data = employeeDto
+        };
     }
 
-    public async Task<ServiceResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
+    public async Task<ServiceResult<EmployeeGetDto>> Create(EmployeeCreateDto employeeCreateDto)
     {
-        var profileExists = await _context.Profiles.AnyAsync(p => p.Id == dtoEmployee.IdProfile);
+        var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeCreateDto.IdProfile);
 
         if (!profileExists)
         {
-            return new ServiceResult<EmployeeDto>
+            return new ServiceResult<EmployeeGetDto>
             {
                 Status = ServiceResultStatus.InvalidInput,
-                Message = $"Profile with id {dtoEmployee.IdProfile} does not exist"
+                Message = $"Profile with id {employeeCreateDto.IdProfile} does not exist"
             };
         }
 
         var dbEmployee = new Employee
         {
-            FullName = dtoEmployee.FullName,
-            Salary = dtoEmployee.Salary,
-            IdProfile = dtoEmployee.IdProfile
+            FullName = employeeCreateDto.FullName,
+            Salary = employeeCreateDto.Salary,
+            IdProfile = employeeCreateDto.IdProfile
         };
 
         await _context.Employees.AddAsync(dbEmployee);
         await _context.SaveChangesAsync();
 
-        var createdEmployeeDto = await GetById(dbEmployee.Id);
-        if (createdEmployeeDto is null)
+        var createdEmployeeDto = new EmployeeGetDto
         {
-            return new ServiceResult<EmployeeDto>
-            {
-                Status = ServiceResultStatus.InvalidInput,
-                Message = "Employee not created"
-            };
-        }
+            Id = dbEmployee.Id,
+            FullName = dbEmployee.FullName,
+            Salary = dbEmployee.Salary,
+            IdProfile = dbEmployee.IdProfile,
+            NameProfile = await _context.Profiles
+                .Where(p => p.Id == dbEmployee.IdProfile)
+                .Select(p => p.Name)
+                .FirstOrDefaultAsync()
+        };
 
-        return new ServiceResult<EmployeeDto>
+        return new ServiceResult<EmployeeGetDto>
         {
             Status = ServiceResultStatus.Success,
             Data = createdEmployeeDto
         };
     }
 
-    public async Task<ServiceResult<EmployeeDto>> Update(int id, EmployeeDto dtoEmployee)
+    public async Task<ServiceResult<EmployeeGetDto>> Update(int id, EmployeeUpdateDto employeeUpdateDto)
     {
-        var profileExists = await _context.Profiles.AnyAsync(p => p.Id == dtoEmployee.IdProfile);
-
-        if (!profileExists)
+        if (employeeUpdateDto.IdProfile.HasValue)
         {
-            return new ServiceResult<EmployeeDto>
+            var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeUpdateDto.IdProfile.Value);
+
+            if (!profileExists)
             {
-                Status = ServiceResultStatus.InvalidInput,
-                Message = $"Profile with id {dtoEmployee.IdProfile} does not exist"
-            };
+                return new ServiceResult<EmployeeGetDto>
+                {
+                    Status = ServiceResultStatus.InvalidInput,
+                    Message = $"Profile with id {employeeUpdateDto.IdProfile.Value} does not exist"
+                };
+            }
         }
 
         var dbEmployee = await _context.Employees
@@ -176,47 +194,66 @@ public class EmployeeService(AppDbContext context)
 
         if (dbEmployee is null)
         {
-            return new ServiceResult<EmployeeDto>
+            return new ServiceResult<EmployeeGetDto>
             {
                 Status = ServiceResultStatus.NotFound,
                 Message = $"Employee with id {id} not found"
             };
         }
 
-        dbEmployee.FullName = dtoEmployee.FullName;
-        dbEmployee.Salary = dtoEmployee.Salary;
-        dbEmployee.IdProfile = dtoEmployee.IdProfile;
+        if (employeeUpdateDto.FullName != null)
+        {
+            dbEmployee.FullName = employeeUpdateDto.FullName;
+        }
+
+        if (employeeUpdateDto.Salary.HasValue)
+        {
+            dbEmployee.Salary = employeeUpdateDto.Salary.Value;
+        }
+
+        if (employeeUpdateDto.IdProfile.HasValue)
+        {
+            dbEmployee.IdProfile = employeeUpdateDto.IdProfile.Value;
+        }
 
         await _context.SaveChangesAsync();
 
-        var updatedEmployeeDto = await GetById(dbEmployee.Id);
-        if (updatedEmployeeDto is null)
+        var updatedEmployeeDto = new EmployeeGetDto
         {
-            return new ServiceResult<EmployeeDto>
-            {
-                Status = ServiceResultStatus.InvalidInput,
-                Message = "Employee not updated"
-            };
-        }
+            Id = dbEmployee.Id,
+            FullName = dbEmployee.FullName,
+            Salary = dbEmployee.Salary,
+            IdProfile = dbEmployee.IdProfile,
+            NameProfile = await _context.Profiles.Where(p => p.Id == dbEmployee.IdProfile).Select(p => p.Name)
+                .FirstOrDefaultAsync()
+        };
 
-        return new ServiceResult<EmployeeDto>
+        return new ServiceResult<EmployeeGetDto>
         {
             Status = ServiceResultStatus.Success,
             Data = updatedEmployeeDto
         };
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<ServiceResult<EmployeeGetDto>> Delete(int id)
     {
         var dbEmployee = await _context.Employees
             .Where(e => e.Id == id)
             .FirstOrDefaultAsync();
 
-        if (dbEmployee is null) return false;
+        if (dbEmployee is null)
+            return new ServiceResult<EmployeeGetDto>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"Employee with id {id} not found"
+            };
 
         _context.Employees.Remove(dbEmployee);
         await _context.SaveChangesAsync();
 
-        return true;
+        return new ServiceResult<EmployeeGetDto>
+        {
+            Status = ServiceResultStatus.Success
+        };
     }
 }

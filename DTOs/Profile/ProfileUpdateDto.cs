@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace crud_api.DTOs.Profile;
 
-public class ProfileDto
+public class ProfileUpdateDto
 {
     public int Id { get; set; }
 

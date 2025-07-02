@@ -77,7 +77,7 @@ public class UserService(AppDbContext context)
 
     public async Task<ServiceResult<UserDto>> GetById(int id)
     {
-        var dtoUser = await _context.Users
+        var userDto = await _context.Users
             .Where(u => u.Id == id)
             .Select(u => new UserDto
             {
@@ -87,7 +87,7 @@ public class UserService(AppDbContext context)
             })
             .FirstOrDefaultAsync();
 
-        if (dtoUser is null)
+        if (userDto is null)
         {
             return new ServiceResult<UserDto>
             {
@@ -98,7 +98,7 @@ public class UserService(AppDbContext context)
 
         var result = new ServiceResult<UserDto>
         {
-            Data = dtoUser,
+            Data = userDto,
             Status = ServiceResultStatus.Success
         };
 
