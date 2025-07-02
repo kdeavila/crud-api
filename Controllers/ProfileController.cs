@@ -14,10 +14,16 @@ public class ProfileController(ProfileService profileService) : ControllerBase
 
     [HttpGet("getall")]
     [Authorize(Roles = "Admin, Editor, Viewer")]
-    public async Task<ActionResult<List<ProfileDto>>> GetAll()
+    public async Task<ActionResult<List<ProfileDto>>> GetAll([FromQuery] ProfileQueryParams profileQueryParams)
     {
-        var profiles = await _profileService.List();
-        return Ok(profiles);
+        var result = await _profileService.GetAllPaginatedAndFiltered(profileQueryParams);
+        
+        return result.Status switch
+        {
+            ServiceResultStatus.Success => Ok(result.Data),
+            ServiceResultStatus.InvalidInput => BadRequest(result.Message),
+            _ => StatusCode(500, "There was an error getting all profiles.")
+        };
     }
 
     [HttpGet("getbyid/{id:int}")]
@@ -45,7 +51,7 @@ public class ProfileController(ProfileService profileService) : ControllerBase
             _ => StatusCode(500, "There was an error creating the profile.")
         };
     }
-    
+
     [Authorize(Roles = "Admin, Editor")]
     [HttpPut("update/{id:int}")]
     public async Task<ActionResult<ProfileDto>> Update(int id, [FromBody] ProfileDto dtoProfile)

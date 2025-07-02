@@ -10,11 +10,63 @@ public class ProfileService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<ProfileDto>> List()
+    public async Task<ServiceResult<PaginatedResultDto<ProfileDto>>> GetAllPaginatedAndFiltered(
+        ProfileQueryParams profileQueryParams)
     {
-        var profiles = await _context.Profiles.ToListAsync();
+        var query = _context.Profiles.AsQueryable();
 
-        return profiles.Select(p => new ProfileDto { Id = p.Id, Name = p.Name, }).ToList();
+        if (!string.IsNullOrEmpty(profileQueryParams.Name))
+        {
+            query = query.Where(p => p.Name.Contains(profileQueryParams.Name));
+        }
+
+        var sortByLower = profileQueryParams.QueryParams.SortBy?.ToLower();
+        var orderLower = profileQueryParams.QueryParams.Order?.ToLower();
+
+        switch (sortByLower)
+        {
+            case "name":
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(p => p.Name)
+                    : query.OrderBy(p => p.Name);
+                break;
+            case "id":
+            default:
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(p => p.Id)
+                    : query.OrderBy(p => p.Id);
+                break;
+        }
+
+        var totalCount = await query.CountAsync();
+
+        query = query
+            .Skip((profileQueryParams.QueryParams.PageNumber - 1) * profileQueryParams.QueryParams.PageSize)
+            .Take(profileQueryParams.QueryParams.PageSize);
+        
+        var paginatedProfiles = await query
+            .Select(p => new ProfileDto
+            {
+                Id = p.Id,
+                Name = p.Name
+            })
+            .ToListAsync();
+
+        var paginatedResult = new PaginatedResultDto<ProfileDto>
+        {
+            Data = paginatedProfiles,
+            TotalCount = totalCount,
+            PageNumber = profileQueryParams.QueryParams.PageNumber,
+            PageSize = profileQueryParams.QueryParams.PageSize
+        };
+        
+        var result = new ServiceResult<PaginatedResultDto<ProfileDto>>
+        {
+            Data = paginatedResult,
+            Status = ServiceResultStatus.Success
+        };
+        
+        return result;
     }
 
     public async Task<ProfileDto?> GetById(int id)
@@ -27,7 +79,7 @@ public class ProfileService(AppDbContext context)
                 Name = p.Name
             })
             .FirstOrDefaultAsync();
-        
+
         return dtoProfile;
     }
 
@@ -48,7 +100,7 @@ public class ProfileService(AppDbContext context)
         {
             Name = dtoProfile.Name
         };
-        
+
         await _context.Profiles.AddAsync(dbProfile);
         await _context.SaveChangesAsync();
 
@@ -70,7 +122,7 @@ public class ProfileService(AppDbContext context)
         var dbProfile = await _context.Profiles
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
-        
+
         if (dbProfile is null)
         {
             return new ServiceResult<ProfileDto>
@@ -79,7 +131,7 @@ public class ProfileService(AppDbContext context)
                 Message = $"Profile with id {id} does not exist."
             };
         }
-        
+
         var nameExists = await _context.Profiles.AnyAsync(p => p.Name == dtoProfile.Name && p.Id != id);
         if (nameExists)
         {
@@ -89,7 +141,7 @@ public class ProfileService(AppDbContext context)
                 Message = $"Profile with name {dtoProfile.Name} already exists"
             };
         }
-        
+
         dbProfile.Name = dtoProfile.Name;
         await _context.SaveChangesAsync();
 
@@ -111,9 +163,9 @@ public class ProfileService(AppDbContext context)
         var dbProfile = await _context.Profiles
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
-        
+
         if (dbProfile is null) return false;
-        
+
         _context.Profiles.Remove(dbProfile);
         await _context.SaveChangesAsync();
         return true;
