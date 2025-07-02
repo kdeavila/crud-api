@@ -4,6 +4,7 @@ namespace crud_api.DTOs.Profile;
 
 public class ProfileUpdateDto
 {
+    [Required(ErrorMessage = "Id is required for update")]
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Name is required")]

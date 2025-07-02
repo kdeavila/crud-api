@@ -235,14 +235,14 @@ public class EmployeeService(AppDbContext context)
         };
     }
 
-    public async Task<ServiceResult<EmployeeGetDto>> Delete(int id)
+    public async Task<ServiceResult<bool>> Delete(int id)
     {
         var dbEmployee = await _context.Employees
             .Where(e => e.Id == id)
             .FirstOrDefaultAsync();
 
         if (dbEmployee is null)
-            return new ServiceResult<EmployeeGetDto>
+            return new ServiceResult<bool>
             {
                 Status = ServiceResultStatus.NotFound,
                 Message = $"Employee with id {id} not found"
@@ -251,9 +251,10 @@ public class EmployeeService(AppDbContext context)
         _context.Employees.Remove(dbEmployee);
         await _context.SaveChangesAsync();
 
-        return new ServiceResult<EmployeeGetDto>
+        return new ServiceResult<bool>
         {
-            Status = ServiceResultStatus.Success
+            Status = ServiceResultStatus.Success,
+            Data = true
         };
     }
 }

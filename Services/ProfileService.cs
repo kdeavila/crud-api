@@ -169,13 +169,13 @@ public class ProfileService(AppDbContext context)
         };
     }
 
-    public async Task<ServiceResult<ProfileGetDto>> Delete(int id)
+    public async Task<ServiceResult<bool>> Delete(int id)
     {
         var dbProfile = await _context.Profiles
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
 
-        if (dbProfile is null) return new ServiceResult<ProfileGetDto>
+        if (dbProfile is null) return new ServiceResult<bool>
         {
             Status = ServiceResultStatus.NotFound,
             Message = $"Profile with id {id} does not exist."
@@ -184,9 +184,10 @@ public class ProfileService(AppDbContext context)
         _context.Profiles.Remove(dbProfile);
         await _context.SaveChangesAsync();
         
-        return new ServiceResult<ProfileGetDto>
+        return new ServiceResult<bool>
         {
-            Status = ServiceResultStatus.Success
+            Status = ServiceResultStatus.Success,
+            Data = true
         };
     }
 }

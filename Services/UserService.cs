@@ -10,7 +10,7 @@ public class UserService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<ServiceResult<PaginatedResultDto<UserDto>>> GetAllPaginatedAndFiltered(
+    public async Task<ServiceResult<PaginatedResultDto<UserGetDto>>> GetAllPaginatedAndFiltered(
         UserQueryParamsDto userQueryParamsDto)
     {
         var query = _context.Users.AsQueryable();
@@ -35,6 +35,11 @@ public class UserService(AppDbContext context)
                     ? query.OrderByDescending(u => u.Email)
                     : query.OrderBy(u => u.Email);
                 break;
+            case "role":
+                query = (orderLower == "desc")
+                    ? query.OrderByDescending(u => u.Role)
+                    : query.OrderBy(u => u.Role);
+                break;
             case "id":
             default:
                 query = (orderLower == "desc")
@@ -50,7 +55,7 @@ public class UserService(AppDbContext context)
             .Take(userQueryParamsDto.QueryParams.PageSize);
 
         var paginatedUser = await query
-            .Select(u => new UserDto
+            .Select(u => new UserGetDto
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -58,7 +63,7 @@ public class UserService(AppDbContext context)
             })
             .ToListAsync();
 
-        var paginatedResult = new PaginatedResultDto<UserDto>
+        var paginatedResult = new PaginatedResultDto<UserGetDto>
         {
             Data = paginatedUser,
             TotalCount = totalCount,
@@ -66,7 +71,7 @@ public class UserService(AppDbContext context)
             PageSize = userQueryParamsDto.QueryParams.PageSize
         };
 
-        var result = new ServiceResult<PaginatedResultDto<UserDto>>
+        var result = new ServiceResult<PaginatedResultDto<UserGetDto>>
         {
             Data = paginatedResult,
             Status = ServiceResultStatus.Success
@@ -75,11 +80,11 @@ public class UserService(AppDbContext context)
         return result;
     }
 
-    public async Task<ServiceResult<UserDto>> GetById(int id)
+    public async Task<ServiceResult<UserGetDto>> GetById(int id)
     {
         var userDto = await _context.Users
             .Where(u => u.Id == id)
-            .Select(u => new UserDto
+            .Select(u => new UserGetDto
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -89,17 +94,96 @@ public class UserService(AppDbContext context)
 
         if (userDto is null)
         {
-            return new ServiceResult<UserDto>
+            return new ServiceResult<UserGetDto>
             {
                 Status = ServiceResultStatus.NotFound,
                 Message = $"User with id {id} not found"
             };
         }
 
-        var result = new ServiceResult<UserDto>
+        var result = new ServiceResult<UserGetDto>
         {
             Data = userDto,
             Status = ServiceResultStatus.Success
+        };
+
+        return result;
+    }
+
+    public async Task<ServiceResult<UserGetDto>> Update(int id, UserUpdateDto userUpdateDto)
+    {
+        var dbUser = await _context.Users
+            .Where(u => u.Id == id)
+            .FirstOrDefaultAsync();
+
+        if (dbUser is null)
+        {
+            return new ServiceResult<UserGetDto>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"User with id {id} not found"
+            };
+        }
+
+        if (userUpdateDto.Email != null)
+        {
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.Email == userUpdateDto.Email && u.Id != id);
+
+            if (emailExists)
+                return new ServiceResult<UserGetDto>
+                {
+                    Status = ServiceResultStatus.Conflict,
+                    Message = $"Email {userUpdateDto.Email} already exists"
+                };
+
+            dbUser.Email = userUpdateDto.Email;
+        }
+
+        if (userUpdateDto.Role.HasValue)
+        {
+            dbUser.Role = userUpdateDto.Role.Value;
+        }
+
+        await _context.SaveChangesAsync();
+        var updatedUserDto = new UserGetDto
+        {
+            Id = dbUser.Id,
+            Email = dbUser.Email,
+            Role = dbUser.Role
+        };
+
+        var result = new ServiceResult<UserGetDto>
+        {
+            Data = updatedUserDto,
+            Status = ServiceResultStatus.Success
+        };
+
+        return result;
+    }
+
+    public async Task<ServiceResult<bool>> Delete(int id)
+    {
+        var dbUser = await _context.Users
+            .Where(u => u.Id == id)
+            .FirstOrDefaultAsync();
+
+        if (dbUser is null)
+        {
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"User with id {id} not found"
+            };
+        }
+
+        _context.Users.Remove(dbUser);
+        await _context.SaveChangesAsync();
+
+        var result = new ServiceResult<bool>
+        {
+            Status = ServiceResultStatus.Success,
+            Data = true
         };
 
         return result;
