@@ -16,6 +16,7 @@ La API proporciona una base sólida para el desarrollo de aplicaciones backend e
 * **Endpoints RESTful:** Adhiere a los principios RESTful para las operaciones CRUD (Crear, Leer, Actualizar, Borrar) de recursos.
 * **Eficiencia en Acceso a Datos:** Aprovecha Entity Framework Core para las interacciones con la base de datos, incluyendo carga anticipada (`.Include()`) y proyecciones eficientes a DTOs (`.Select()`).
 * **Integración con SQL Server:** Utiliza SQL Server como motor de base de datos relacional.
+* **Paginación y Filtrado Avanzado:** Implementación de un sistema flexible de paginación y filtrado para endpoints de listado, utilizando DTOs genéricos y reutilizables.
 
 ## 🔑 Seguridad y Autenticación
 
@@ -42,6 +43,7 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 * [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 * SQL Server (puedes usar SQL Server Express, LocalDB o una instancia completa)
 * Una herramienta para la gestión de bases de datos como DBeaver o SQL Server Management Studio (opcional, para inspección).
+* [Insomnia](https://insomnia.rest/download) (o Postman, aunque la colección proporcionada es para Insomnia).
 
 ### ⚙️ Configuración del Proyecto
 
@@ -78,224 +80,83 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
     dotnet run
     ```
 3.  La API se iniciará y típicamente escuchará en `https://localhost:7000` (o un puerto diferente, revisa la salida de la consola para la URL exacta).
-4.  Puedes usar herramientas como Postman, Insomnia o un navegador web para interactuar con la API.
 
-## 🌐 Endpoints de la API
+## 🌐 Endpoints de la API con Insomnia
 
-### 🔐 Autenticación (`/Auth`)
+Para facilitar la interacción con la API, se proporciona una colección de Insomnia preconfigurada.
 
-* **`POST /Auth/login`**
-    * **Descripción:** Autentica a un usuario y devuelve un JSON Web Token (JWT) si las credenciales son válidas.
-    * **Cuerpo de la Petición (`UserLoginDto`):**
-        ```json
-        {
-          "email": "usuario@ejemplo.com",
-          "password": "miContrasenaSegura123"
-        }
-        ```
-    * **Códigos de Respuesta:** `200 OK` (con JWT), `400 Bad Request` (datos de entrada inválidos), `404 Not Found` (usuario no encontrado o credenciales inválidas).
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        {
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3VhcmlvQGVqZW1wbG8uY29tIiwianRpIjoiZmRlY..."
-        }
-        ```
+### 📥 Importar la Colección de Insomnia
 
-* **`POST /Auth/register`**
+1.  Abre Insomnia.
+2.  Ve a `File > Import > From File` (o `Archivo > Importar > Desde Archivo`).
+3.  Selecciona el archivo `Insomnia.yaml` que se encuentra en la raíz de este repositorio.
+4.  Esto importará la colección "CRUD API" con sus carpetas (`Auth`, `Employees`, `Profiles`) y todas las solicitudes preconfiguradas.
+
+### 🔑 Autenticación y Gestión de Tokens
+
+* Tu API requiere autenticación JWT para la mayoría de los endpoints protegidos. La colección de Insomnia ya está configurada para automatizar este proceso:
+    1.  Abre la solicitud `POST /api/auth/login` dentro de la carpeta `Auth`.
+    2.  Envía la solicitud con las credenciales de un usuario existente (ej. `admin@example.com` con su contraseña).
+    3.  **Gestión Automática del Token:** Todas las demás solicitudes protegidas en las carpetas `Employees` y `Profiles` tienen configurado un **Bearer Token** que **extrae automáticamente el JWT** de la respuesta exitosa del login. Esto significa que no necesitas copiar y pegar el token manualmente cada vez que expire o inicies sesión.
+    4.  Simplemente ejecuta el `Login` cuando necesites un token fresco, y las demás solicitudes lo usarán de forma transparente.
+
+### 🔗 Descripción General de Endpoints
+
+* **Base URL:** Todas las peticiones usan `http://localhost:5190/api` como base.
+
+#### 🔐 Autenticación (`/Auth`)
+
+* **`POST /auth/login`**
+    * **Descripción:** Autentica a un usuario y devuelve un JSON Web Token (JWT).
+    * **Cuerpo de la Petición (`UserLoginDto`):** `email`, `password`.
+* **`POST /auth/register`**
     * **Descripción:** Registra un nuevo usuario en el sistema. Protegido por el rol `Admin`.
-    * **Cuerpo de la Petición (`UserRegisterDto`):**
-        ```json
-        {
-          "email": "nuevo.usuario@ejemplo.com",
-          "password": "otraContrasenaSegura456!",
-          "role": "Viewer" // O "Manager", "Admin"
-        }
-        ```
-    * **Códigos de Respuesta:** `200 OK`, `400 Bad Request` (errores de validación, rol inválido), `409 Conflict` (usuario ya existe), `401 Unauthorized` (si no es Admin).
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        "Registration successful"
-        ```
+    * **Cuerpo de la Petición (`UserRegisterDto`):** `email`, `password`, `role` (`Viewer`, `Manager`, `Admin`).
 
-### 🧑‍💻 Empleados (`/Employee`)
+#### 🧑‍💻 Empleados (`/Employee`)
 
-* **`GET /Employee/getall`**
-    * **Descripción:** Recupera una lista de todos los empleados. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
-    * **Código de Respuesta:** `200 OK`
-    * **Ejemplo de Respuesta:**
-        ```json
-        [
-            {
-                "id": 1,
-                "fullName": "Juan David Pérez",
-                "salary": 5500000,
-                "idProfile": 1,
-                "nameProfile": "Desarrollador Frontend"
-            }
-            // ... más empleados
-        ]
-        ```
-
-* **`GET /Employee/getbyid/{id}`**
-    * **Descripción:** Recupera un único empleado por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
-    * **Código de Respuesta:** `200 OK` (si se encuentra), `404 Not Found` (si no se encuentra)
-    * **Ejemplo de Petición (para ID 1):** `GET /Employee/getbyid/1`
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        {
-            "id": 1,
-            "fullName": "Juan David Pérez",
-            "salary": 5500000,
-            "idProfile": 1,
-            "nameProfile": "Desarrollador Frontend"
-        }
-        ```
-    * **Ejemplo de Respuesta (404 Not Found):**
-        ```json
-        "Empleado con ID 99 no encontrado."
-        ```
-
-* **`POST /Employee`**
+* **`GET /employee/getall`**
+    * **Descripción:** Recupera una lista paginada y filtrada de empleados. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
+    * **Parámetros de Paginación/Ordenamiento (genéricos - `QueryParamsDto`):**
+        * `QueryParams.PageNumber`: Número de página (ej. `1`, `2`).
+        * `QueryParams.PageSize`: Cantidad de ítems por página (ej. `10`, `15`).
+        * `QueryParams.SortBy`: Campo por el cual ordenar (ej. `id`, `fullName`, `salary`, `profile`).
+        * `QueryParams.Order`: Orden de la paginación (`asc` para ascendente, `desc` para descendente).
+    * **Parámetros de Filtrado (específicos de empleado):**
+        * `FullName`: Filtra por el nombre completo del empleado.
+        * `MinSalary`: Salario mínimo.
+        * `MaxSalary`: Salario máximo.
+        * `IdProfile`: ID del perfil asociado.
+    * **Importante para Insomnia:** Los parámetros de ejemplo en la solicitud `Get all` de Insomnia están `disabled` (deshabilitados) por defecto en la colección importada. Deberás habilitarlos en la pestaña "Params" y ajustar sus valores para probar la paginación y el filtrado.
+* **`GET /employee/getbyid/{id}`**
+    * **Descripción:** Recupera un empleado por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
+* **`POST /employee/create`**
     * **Descripción:** Crea un nuevo empleado. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Cuerpo de la Petición (`EmployeeDto`):**
-        ```json
-        {
-            "fullName": "Nuevo Empleado de Prueba",
-            "salary": 4800000,
-            "idProfile": 3
-        }
-        ```
-    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (por errores de validación o `IdProfile` inválido), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (201 Created):**
-        ```json
-        {
-            "id": 16, // ID generado automáticamente
-            "fullName": "Nuevo Empleado de Prueba",
-            "salary": 4800000,
-            "idProfile": 3,
-            "nameProfile": "Ingeniero QA"
-        }
-        ```
-      *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/Employee/getbyid/16`*
-
-* **`PUT /Employee/{id}`**
+* **`PUT /employee/update/{id}`**
     * **Descripción:** Actualiza un empleado existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Cuerpo de la Petición (`EmployeeDto`):**
-      *Ejemplo para actualizar el empleado con ID 1:*
-        ```json
-        {
-            "id": 1,
-            "fullName": "Juan David Pérez Actualizado",
-            "salary": 5600000,
-            "idProfile": 1
-        }
-        ```
-    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden o `IdProfile` inválido), `404 Not Found` (si el empleado no existe), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        {
-            "id": 1,
-            "fullName": "Juan David Pérez Actualizado",
-            "salary": 5600000,
-            "idProfile": 1,
-            "nameProfile": "Desarrollador Frontend"
-        }
-        ```
-
-* **`DELETE /Employee/{id}`**
+* **`DELETE /employee/delete/{id}`**
     * **Descripción:** Elimina un empleado por su ID. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el empleado no existe), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
 
-### 👥 Perfiles (`/Profile`)
+#### 👥 Perfiles (`/Profile`)
 
-* **`GET /Profile/getall`**
-    * **Descripción:** Recupera una lista de todos los perfiles. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
-    * **Código de Respuesta:** `200 OK`
-    * **Ejemplo de Respuesta:**
-        ```json
-        [
-            {
-                "id": 1,
-                "name": "Desarrollador Frontend"
-            },
-            {
-                "id": 2,
-                "name": "Desarrollador Backend"
-            }
-            // ... más perfiles
-        ]
-        ```
-
-* **`GET /Profile/getbyid/{id}`**
-    * **Descripción:** Recupera un único perfil por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
-    * **Código de Respuesta:** `200 OK` (si se encuentra), `404 Not Found` (si no se encuentra)
-    * **Ejemplo de Petición (para ID 1):** `GET /Profile/getbyid/1`
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        {
-            "id": 1,
-            "name": "Desarrollador Frontend"
-        }
-        ```
-    * **Ejemplo de Respuesta (404 Not Found):**
-        ```json
-        "Profile not found!"
-        ```
-
-* **`POST /Profile/create`**
+* **`GET /profile/getall`**
+    * **Descripción:** Recupera una lista paginada y filtrada de perfiles. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
+    * **Parámetros de Paginación/Ordenamiento (genéricos - `QueryParamsDto`):**
+        * `QueryParams.PageNumber`, `QueryParams.PageSize`, `QueryParams.SortBy` (ej. `id`, `name`), `QueryParams.Order`.
+    * **Parámetros de Filtrado (específicos de perfil):**
+        * `Name`: Filtra por el nombre del perfil.
+    * **Importante para Insomnia:** Los parámetros de ejemplo en la solicitud `Get all` de Insomnia están `disabled` (deshabilitados) por defecto en la colección importada. Deberás habilitarlos en la pestaña "Params" y ajustar sus valores para probar la paginación y el filtrado.
+* **`GET /profile/getbyid/{id}`**
+    * **Descripción:** Recupera un perfil por su ID. Requiere autenticación con rol `Admin`, `Manager` o `Viewer`.
+* **`POST /profile/create`**
     * **Descripción:** Crea un nuevo perfil. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Cuerpo de la Petición (`ProfileDto`):**
-        ```json
-        {
-            "name": "Nuevo Perfil"
-        }
-        ```
-    * **Código de Respuesta:** `201 Created` (si es exitoso), `400 Bad Request` (errores de validación), `409 Conflict` (si el nombre ya existe), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (201 Created):**
-        ```json
-        {
-            "id": 5, // ID generado automáticamente
-            "name": "Nuevo Perfil"
-        }
-        ```
-      *La cabecera `Location` de la respuesta indicará el URL del nuevo recurso creado, por ejemplo: `/api/Profile/getbyid/5`*
-    * **Ejemplo de Respuesta (409 Conflict):**
-        ```json
-        "Profile with name 'Nuevo Perfil' already exists."
-        ```
-
-* **`PUT /Profile/update/{id}`**
+* **`PUT /profile/update/{id}`**
     * **Descripción:** Actualiza un perfil existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Cuerpo de la Petición (`ProfileDto`):**
-      *Ejemplo para actualizar el perfil con ID 1:*
-        ```json
-        {
-            "id": 1,
-            "name": "Desarrollador Frontend Actualizado"
-        }
-        ```
-    * **Código de Respuesta:** `200 OK` (si es exitoso), `400 Bad Request` (errores de validación, IDs no coinciden), `404 Not Found` (si el perfil no existe), `409 Conflict` (si el nuevo nombre ya existe para otro perfil), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (200 OK):**
-        ```json
-        {
-            "id": 1,
-            "name": "Desarrollador Frontend Actualizado"
-        }
-        ```
-    * **Ejemplo de Respuesta (409 Conflict):**
-        ```json
-        "Profile with name 'Desarrollador Backend' already exists for another profile."
-        ```
-
-* **`DELETE /Profile/delete/{id}`**
+* **`DELETE /profile/delete/{id}`**
     * **Descripción:** Elimina un perfil por su ID. Requiere autenticación con rol `Admin` o `Manager`.
-    * **Código de Respuesta:** `204 No Content` (si es exitoso), `404 Not Found` (si el perfil no existe), `401 Unauthorized`.
-    * **Ejemplo de Respuesta (204 No Content):** (Cuerpo de la respuesta vacío)
 
 ## 🌟 Próximas Mejoras
 
-* Implementar paginación y filtrado más avanzado para los endpoints GET.
 * Mejoras en el registro (logging) y manejo de errores.
 * Implementación de pruebas unitarias y de integración.
 * Documentación de API con Swagger/OpenAPI.

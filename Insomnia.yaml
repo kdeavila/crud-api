@@ -1,0 +1,471 @@
+type: collection.insomnia.rest/5.0
+name: CRUD API
+meta:
+  id: wrk_e3734c5fa329476abfae14d7b633b5af
+  created: 1750655547473
+  modified: 1750655547473
+  description: ""
+collection:
+  - name: Employees
+    meta:
+      id: fld_90fff99d5030434092f196e5d79b676c
+      created: 1750698549561
+      modified: 1750698583635
+      sortKey: -1750698549562
+      description: ""
+    children:
+      - url: http://localhost:5190/api/employee/getall
+        name: Get all
+        meta:
+          id: req_ea31be027eab4da8a0e87e5da2b13bc0
+          created: 1750655745206
+          modified: 1751437010409
+          isPrivate: false
+          description: ""
+          sortKey: -1750698577060
+        method: GET
+        parameters:
+          - name: queryparams.pagenumber
+            value: "1"
+            id: pair_93a44b4a22dc496297a121d0423bb77b
+            disabled: true
+          - id: pair_4289c1a4cd574fd3a8d16f0386292a7a
+            name: queryparams.pagesize
+            value: "15"
+            description: ""
+            disabled: true
+          - id: pair_8ba313de9c7047de9b7e12a5110351d7
+            name: queryparams.sortby
+            value: salary
+            description: ""
+            disabled: true
+          - id: pair_6e75ef6999c64391995d5b8864291c61
+            name: queryparams.order
+            value: desc
+            description: ""
+            disabled: true
+          - id: pair_b9c5920f8961416cbd0de5b7e7d3dbea
+            name: fullname
+            value: keyner
+            description: ""
+            disabled: true
+          - id: pair_24686c8513e446cabecbb582e71a4023
+            name: idprofile
+            value: "2"
+            description: ""
+            disabled: true
+          - id: pair_24216aa2f7214fd9a3d4b25099fa9098
+            name: minsalary
+            value: "23000"
+            description: ""
+            disabled: true
+          - id: pair_9d994b250e0248cab1e0e23545eac7f8
+            name: maxsalary
+            value: "6800000"
+            description: ""
+            disabled: true
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/employee/getbyid/15
+        name: Get by ID
+        meta:
+          id: req_0c622243900b4f8f8befeb93b690fbbb
+          created: 1750655774658
+          modified: 1751434293338
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576960
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/employee/create
+        name: Create
+        meta:
+          id: req_4d1ca0ed9fd9498f815940a5cf012dfb
+          created: 1750655849966
+          modified: 1751434296280
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576860
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"fullName": "Marco Peréz",
+            	"salary": 15000,
+            	"idProfile": 10
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/employee/update/15
+        name: Update
+        meta:
+          id: req_e23ff2139e294d6fbb9117e4f1c1972f
+          created: 1750656201810
+          modified: 1751434309663
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576760
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"id": 15,
+            	"fullName": "Andrés Loaiza",
+            	"salary": 12750,
+            	"idProfile": 9
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/employee/delete/15
+        name: Delete
+        meta:
+          id: req_aec2953950ba491ca3288a5ea4964e39
+          created: 1750656571586
+          modified: 1751434321057
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576660
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: ""
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Profiles
+    meta:
+      id: fld_3a75966fb77f460ca26bfffe2bd2c499
+      created: 1750698665125
+      modified: 1751177837972
+      sortKey: -1750698549512
+      description: ""
+    children:
+      - url: http://localhost:5190/api/profile/getall
+        name: Get all
+        meta:
+          id: req_f95a0cdf4c214350bdd5d36eb48146cb
+          created: 1750698665128
+          modified: 1751438080957
+          isPrivate: false
+          description: ""
+          sortKey: -1750698577060
+        method: GET
+        parameters:
+          - id: pair_230e7c78899843f28617c14e7f646cf6
+            name: queryparams.pagenumber
+            value: "2"
+            description: ""
+            disabled: true
+          - id: pair_0d3c3356114f4cef8e38b218b85e3f99
+            name: queryparams.pagesize
+            value: "5"
+            description: ""
+            disabled: true
+          - id: pair_3b36330a7e4b4daab5866195c77455fd
+            name: queryparams.sortby
+            value: name
+            description: ""
+            disabled: true
+          - id: pair_c71dcceb5af94ac9a654bade7ee97686
+            name: queryparams.order
+            value: desc
+            description: ""
+            disabled: true
+          - id: pair_ef8f99bbfdc443b1827bbf2f35dd9d8e
+            name: name
+            value: desarrollador
+            description: ""
+            disabled: true
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/profile/getbyid/8
+        name: Get by ID
+        meta:
+          id: req_6745acc17f6f47d4b303a1151ea48c8b
+          created: 1750698665132
+          modified: 1751434338949
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576960
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/profile/create
+        name: Create
+        meta:
+          id: req_e0ad42fe918d48778ce629e1d60a0648
+          created: 1750698665137
+          modified: 1751434345669
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576860
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            		"name": "Product Manager"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/profile/update/11
+        name: Update
+        meta:
+          id: req_c292ac754a94439b93f9457a02a14ca2
+          created: 1750698665141
+          modified: 1751434963717
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576760
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            		"id": 11,
+            		"name": "Gerente de negocios"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/employee/delete/11
+        name: Delete
+        meta:
+          id: req_8f3a4219cf7847c18b77352faad4ffec
+          created: 1750698665145
+          modified: 1751434357351
+          isPrivate: false
+          description: ""
+          sortKey: -1750698576660
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Auth
+    meta:
+      id: fld_6d23d57c6fd4418e946d6f2b8edb7df0
+      created: 1751178005920
+      modified: 1751178005920
+      sortKey: -1751178005920
+      description: ""
+    children:
+      - url: http://localhost:5190/api/auth/login
+        name: Login
+        meta:
+          id: req_14029c98dd2e45a19422c4c3ab87caa5
+          created: 1751178009355
+          modified: 1751434943038
+          isPrivate: false
+          description: ""
+          sortKey: -1751178024444
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "admin@example.com",
+            	"password": "adminexample123!"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/auth/register
+        name: Register
+        meta:
+          id: req_79b5f6689c6344e29b2227430b296dfc
+          created: 1751178173331
+          modified: 1751434274257
+          isPrivate: false
+          description: ""
+          sortKey: -1750938300752
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "kdeavila.ts@gmail.com",
+            	"password": "Slimmerancher123",
+            	"role": "admin"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_17d4b9c4c265e838d7b683aef65a56352c0b3e63
+    created: 1750655547539
+    modified: 1750655547539
+environments:
+  name: Development
+  meta:
+    id: env_17d4b9c4c265e838d7b683aef65a56352c0b3e63
+    created: 1750655547534
+    modified: 1751433910309
+    isPrivate: false
+  data:
+    "": ""
