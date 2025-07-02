@@ -25,7 +25,7 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
             _ => StatusCode(500, "There was an error getting all employees.")
         };
     }
-
+    
     [Authorize(Roles = "Admin, Editor, Viewer")]
     [HttpGet("getbyid/{id:int}")]
     public async Task<ActionResult<EmployeeDto>> GetById(int id)
