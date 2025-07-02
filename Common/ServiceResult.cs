@@ -1,10 +1,8 @@
-using crud_api.DTOs;
-
 namespace crud_api.Common;
 
-public class ProfileServiceResult
+public class ServiceResult<T>
 {
     public ServiceResultStatus Status { get; set; }
-    public ProfileDto? Data { get; set; }
+    public T? Data { get; set; }
     public string? Message { get; set; }
 }

@@ -16,8 +16,14 @@ public class EmployeeController(EmployeeService employeeService) : ControllerBas
     [Authorize(Roles = "Admin, Editor, Viewer")]
     public async Task<ActionResult<List<EmployeeDto>>> GetAll([FromQuery] EmployeeQueryParamsDto employeeQueryParamsDto)
     {
-        var employees = await _employeeService.GetAllPaginatedAndFiltered(employeeQueryParamsDto);
-        return Ok(employees);
+        var result = await _employeeService.GetAllPaginatedAndFiltered(employeeQueryParamsDto);
+
+        return result.Status switch
+        {
+            ServiceResultStatus.Success => Ok(result.Data),
+            ServiceResultStatus.InvalidInput => BadRequest(result.Message),
+            _ => StatusCode(500, "There was an error getting all employees.")
+        };
     }
 
     [Authorize(Roles = "Admin, Editor, Viewer")]

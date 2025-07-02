@@ -10,7 +10,7 @@ public class EmployeeService(AppDbContext context)
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<PaginatedResultDto<EmployeeDto>> GetAllPaginatedAndFiltered(
+    public async Task<ServiceResult<PaginatedResultDto<EmployeeDto>>> GetAllPaginatedAndFiltered(
         EmployeeQueryParamsDto employeeQueryParamsDto)
     {
         var query = _context.Employees.AsQueryable();
@@ -64,7 +64,7 @@ public class EmployeeService(AppDbContext context)
                 break;
         }
 
-        int totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync();
 
         query = query
             .Skip((employeeQueryParamsDto.PageNumber - 1) * employeeQueryParamsDto.PageSize)
@@ -81,7 +81,7 @@ public class EmployeeService(AppDbContext context)
             })
             .ToListAsync();
 
-        var result = new PaginatedResultDto<EmployeeDto>
+        var paginatedResult = new PaginatedResultDto<EmployeeDto>
         {
             Data = paginatedEmployees,
             TotalCount = totalCount,
@@ -89,6 +89,12 @@ public class EmployeeService(AppDbContext context)
             PageSize = employeeQueryParamsDto.PageSize
         };
 
+        var result = new ServiceResult<PaginatedResultDto<EmployeeDto>>
+        {
+            Data = paginatedResult,
+            Status = ServiceResultStatus.Success
+        };
+        
         return result;
     }
 
@@ -110,13 +116,13 @@ public class EmployeeService(AppDbContext context)
         return dtoEmployee;
     }
 
-    public async Task<EmployeeServiceResult> Create(EmployeeDto dtoEmployee)
+    public async Task<ServiceResult<EmployeeDto>> Create(EmployeeDto dtoEmployee)
     {
         var profileExists = await _context.Profiles.AnyAsync(p => p.Id == dtoEmployee.IdProfile);
 
         if (!profileExists)
         {
-            return new EmployeeServiceResult
+            return new ServiceResult<EmployeeDto>
             {
                 Status = ServiceResultStatus.InvalidInput,
                 Message = $"Profile with id {dtoEmployee.IdProfile} does not exist"
@@ -136,27 +142,27 @@ public class EmployeeService(AppDbContext context)
         var createdEmployeeDto = await GetById(dbEmployee.Id);
         if (createdEmployeeDto is null)
         {
-            return new EmployeeServiceResult
+            return new ServiceResult<EmployeeDto>
             {
                 Status = ServiceResultStatus.InvalidInput,
                 Message = "Employee not created"
             };
         }
 
-        return new EmployeeServiceResult
+        return new ServiceResult<EmployeeDto>
         {
             Status = ServiceResultStatus.Success,
             Data = createdEmployeeDto
         };
     }
 
-    public async Task<EmployeeServiceResult> Update(int id, EmployeeDto dtoEmployee)
+    public async Task<ServiceResult<EmployeeDto>> Update(int id, EmployeeDto dtoEmployee)
     {
         var profileExists = await _context.Profiles.AnyAsync(p => p.Id == dtoEmployee.IdProfile);
 
         if (!profileExists)
         {
-            return new EmployeeServiceResult
+            return new ServiceResult<EmployeeDto>
             {
                 Status = ServiceResultStatus.InvalidInput,
                 Message = $"Profile with id {dtoEmployee.IdProfile} does not exist"
@@ -169,7 +175,7 @@ public class EmployeeService(AppDbContext context)
 
         if (dbEmployee is null)
         {
-            return new EmployeeServiceResult
+            return new ServiceResult<EmployeeDto>
             {
                 Status = ServiceResultStatus.NotFound,
                 Message = $"Employee with id {id} not found"
@@ -185,14 +191,14 @@ public class EmployeeService(AppDbContext context)
         var updatedEmployeeDto = await GetById(dbEmployee.Id);
         if (updatedEmployeeDto is null)
         {
-            return new EmployeeServiceResult
+            return new ServiceResult<EmployeeDto>
             {
                 Status = ServiceResultStatus.InvalidInput,
                 Message = "Employee not updated"
             };
         }
 
-        return new EmployeeServiceResult
+        return new ServiceResult<EmployeeDto>
         {
             Status = ServiceResultStatus.Success,
             Data = updatedEmployeeDto

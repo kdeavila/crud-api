@@ -31,13 +31,13 @@ public class ProfileService(AppDbContext context)
         return dtoProfile;
     }
 
-    public async Task<ProfileServiceResult> Create(ProfileDto dtoProfile)
+    public async Task<ServiceResult<ProfileDto>> Create(ProfileDto dtoProfile)
     {
         var nameExists = await _context.Profiles.AnyAsync(p => p.Name == dtoProfile.Name);
 
         if (nameExists)
         {
-            return new ProfileServiceResult
+            return new ServiceResult<ProfileDto>
             {
                 Status = ServiceResultStatus.Conflict,
                 Message = $"Profile with name {dtoProfile.Name} already exists"
@@ -58,14 +58,14 @@ public class ProfileService(AppDbContext context)
             Name = dbProfile.Name
         };
 
-        return new ProfileServiceResult
+        return new ServiceResult<ProfileDto>
         {
             Status = ServiceResultStatus.Success,
             Data = createdProfileDto
         };
     }
 
-    public async Task<ProfileServiceResult> Update(int id, ProfileDto dtoProfile)
+    public async Task<ServiceResult<ProfileDto>> Update(int id, ProfileDto dtoProfile)
     {
         var dbProfile = await _context.Profiles
             .Where(p => p.Id == id)
@@ -73,7 +73,7 @@ public class ProfileService(AppDbContext context)
         
         if (dbProfile is null)
         {
-            return new ProfileServiceResult
+            return new ServiceResult<ProfileDto>
             {
                 Status = ServiceResultStatus.NotFound,
                 Message = $"Profile with id {id} does not exist."
@@ -83,7 +83,7 @@ public class ProfileService(AppDbContext context)
         var nameExists = await _context.Profiles.AnyAsync(p => p.Name == dtoProfile.Name && p.Id != id);
         if (nameExists)
         {
-            return new ProfileServiceResult
+            return new ServiceResult<ProfileDto>
             {
                 Status = ServiceResultStatus.Conflict,
                 Message = $"Profile with name {dtoProfile.Name} already exists"
@@ -99,7 +99,7 @@ public class ProfileService(AppDbContext context)
             Name = dbProfile.Name
         };
 
-        return new ProfileServiceResult
+        return new ServiceResult<ProfileDto>
         {
             Status = ServiceResultStatus.Success,
             Data = updatedProfileDto

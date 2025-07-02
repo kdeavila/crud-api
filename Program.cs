@@ -25,7 +25,7 @@ builder.Services.AddAuthentication(config =>
     config.SaveToken = true;
     
     var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-    var keyBytes = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
+    var keyBytes = Encoding.UTF8.GetBytes(jwtSettings!.SecretKey);
 
     config.TokenValidationParameters = new TokenValidationParameters
     {
