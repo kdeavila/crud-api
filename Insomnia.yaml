@@ -19,7 +19,7 @@ collection:
         meta:
           id: req_ea31be027eab4da8a0e87e5da2b13bc0
           created: 1750655745206
-          modified: 1751437010409
+          modified: 1751494394501
           isPrivate: false
           description: ""
           sortKey: -1750698577060
@@ -175,15 +175,15 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/15
+      - url: http://localhost:5190/api/employee/delete/17
         name: Delete
         meta:
-          id: req_aec2953950ba491ca3288a5ea4964e39
-          created: 1750656571586
-          modified: 1751434321057
+          id: req_dd530ec96c1e43f39807b0dc8089cd99
+          created: 1751493723740
+          modified: 1751494300611
           isPrivate: false
           description: ""
-          sortKey: -1750698576660
+          sortKey: -1750698576610
         method: DELETE
         body:
           mimeType: application/json
@@ -218,7 +218,7 @@ collection:
         meta:
           id: req_f95a0cdf4c214350bdd5d36eb48146cb
           created: 1750698665128
-          modified: 1751438080957
+          modified: 1751494351300
           isPrivate: false
           description: ""
           sortKey: -1750698577060
@@ -356,12 +356,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/11
+      - url: http://localhost:5190/api/employee/delete/12
         name: Delete
         meta:
           id: req_8f3a4219cf7847c18b77352faad4ffec
           created: 1750698665145
-          modified: 1751434357351
+          modified: 1751494333463
           isPrivate: false
           description: ""
           sortKey: -1750698576660
@@ -385,8 +385,8 @@ collection:
     meta:
       id: fld_6d23d57c6fd4418e946d6f2b8edb7df0
       created: 1751178005920
-      modified: 1751178005920
-      sortKey: -1751178005920
+      modified: 1751494131614
+      sortKey: -1751494054471
       description: ""
     children:
       - url: http://localhost:5190/api/auth/login
@@ -394,7 +394,7 @@ collection:
         meta:
           id: req_14029c98dd2e45a19422c4c3ab87caa5
           created: 1751178009355
-          modified: 1751434943038
+          modified: 1751494281190
           isPrivate: false
           description: ""
           sortKey: -1751178024444
@@ -403,8 +403,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"email": "admin@example.com",
-            	"password": "adminexample123!"
+            	"email": "correo@correo.com",
+            	"password": "Slimmerancher123"
             }
         headers:
           - name: Content-Type
@@ -424,7 +424,7 @@ collection:
         meta:
           id: req_79b5f6689c6344e29b2227430b296dfc
           created: 1751178173331
-          modified: 1751434274257
+          modified: 1751494162717
           isPrivate: false
           description: ""
           sortKey: -1750938300752
@@ -433,9 +433,153 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"email": "kdeavila.ts@gmail.com",
+            	"email": "correo@correo.com",
             	"password": "Slimmerancher123",
             	"role": "admin"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: User
+    meta:
+      id: fld_9cd2dfea2b7a425bb493ec70ad9ab5ed
+      created: 1751494054371
+      modified: 1751494054371
+      sortKey: -1751494054371
+      description: ""
+    children:
+      - url: http://localhost:5190/api/user/delete/6
+        name: Delete
+        meta:
+          id: req_aec2953950ba491ca3288a5ea4964e39
+          created: 1750656571586
+          modified: 1751494106830
+          isPrivate: false
+          description: ""
+          sortKey: -1751494081205
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: ""
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/user/getall
+        name: Get all
+        meta:
+          id: req_90649a2f745e4882bac3c38e5dfc5a55
+          created: 1751485042015
+          modified: 1751496363584
+          isPrivate: false
+          description: ""
+          sortKey: -1751494081305
+        method: GET
+        parameters:
+          - id: pair_9f133150b02a4cafaa6e5b3536dd69ae
+            name: queryparams.pagenumber
+            value: "2"
+            description: ""
+            disabled: true
+          - id: pair_8d42cf626a9043edbcf5bb8db40e1c1e
+            name: queryparams.pagesize
+            value: "2"
+            description: ""
+            disabled: true
+          - id: pair_f816c09883e54da595f8beae7cf82595
+            name: queryparams.sortby
+            value: email
+            description: ""
+            disabled: false
+          - id: pair_d5d4f905a9df481ab10b833912de9009
+            name: queryparams.order
+            value: asc
+            description: ""
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/user/getbyid/6
+        name: Get by ID
+        meta:
+          id: req_54fcddbd3be54f21ae9438cc500e66f4
+          created: 1751485696687
+          modified: 1751494175107
+          isPrivate: false
+          description: ""
+          sortKey: -1751494081280
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
+            'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: http://localhost:5190/api/user/update/9
+        name: Update
+        meta:
+          id: req_a4b3c815e212472c91f43652922ad6f0
+          created: 1751493715619
+          modified: 1751494110148
+          isPrivate: false
+          description: ""
+          sortKey: -1751494081255
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"id": 9,
+            	"email": "kda.csharp@gmail.com",
+            	"role": "Admin"
             }
         headers:
           - name: Content-Type
