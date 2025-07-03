@@ -2,28 +2,24 @@
 
 ## ✨ Descripción del Proyecto
 
-Este proyecto es una demostración de una API Web robusta y bien estructurada, construida con **ASP.NET Core (.NET 9)** y **Entity Framework Core**, diseñada para la gestión de datos de empleados y perfiles. El objetivo principal es mostrar la implementación de principios de **Clean Architecture**, una clara **separación de responsabilidades** entre capas (Controladores, Servicios, Entidades, DTOs) y una **validación de datos exhaustiva** en cada nivel.
-
-La API proporciona una base sólida para el desarrollo de aplicaciones backend escalables, mantenibles y fáciles de testear.
+Este proyecto demuestra una API Web robusta y estructurada con **ASP.NET Core (.NET 9)** y **Entity Framework Core**, enfocada en la gestión de empleados, perfiles y usuarios. Implementa **Clean Architecture**, **separación de responsabilidades** (Controladores, Servicios, Entidades, DTOs) y **validación de datos exhaustiva**, proporcionando una base escalable y mantenible.
 
 ## 🚀 Características Clave
 
-* **Arquitectura por Capas:** Separación clara entre la capa de presentación (Controladores), la lógica de negocio (Servicios) y el acceso a datos (Entidades, DbContext).
-* **Validación de Entrada Robusta:**
-    * Utiliza `Data Annotations` en los DTOs para la validación automática del modelo.
-    * Implementa validaciones de reglas de negocio específicas dentro de la capa de Servicios (ej. verificar la existencia de claves foráneas o unicidad de nombres).
-* **Respuestas API Explícitas:** Emplea objetos de resultado personalizados (`ServiceResultStatus`) desde la capa de servicio para habilitar respuestas HTTP precisas y significativas (ej. `200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`).
+* **Arquitectura por Capas:** Separación clara entre la presentación (Controladores), lógica de negocio (Servicios) y acceso a datos (EF Core).
+* **Validación de Entrada Robusta:** Con `Data Annotations` en DTOs y validaciones de reglas de negocio en Servicios (ej. unicidad, claves foráneas).
+* **Respuestas API Explícitas:** Usa `ServiceResultStatus` para respuestas HTTP precisas (`200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `409 Conflict`).
 * **Endpoints RESTful:** Adhiere a los principios RESTful para las operaciones CRUD (Crear, Leer, Actualizar, Borrar) de recursos.
-* **Eficiencia en Acceso a Datos:** Aprovecha Entity Framework Core para las interacciones con la base de datos, incluyendo carga anticipada (`.Include()`) y proyecciones eficientes a DTOs (`.Select()`).
+* **Eficiencia en Acceso a Datos:** Entity Framework Core para interacciones optimizadas (ej. `.Include()`, `.Select()`).
 * **Integración con SQL Server:** Utiliza SQL Server como motor de base de datos relacional.
 * **Paginación y Filtrado Avanzado:** Implementación de un sistema flexible de paginación y filtrado para endpoints de listado, utilizando DTOs genéricos y reutilizables.
 
 ## 🔑 Seguridad y Autenticación
 
-* **Autenticación Basada en Tokens JWT:** Implementación de un flujo de autenticación seguro utilizando JSON Web Tokens (JWT) para verificar la identidad del usuario. Los nombres de los roles se manejan como strings para mayor legibilidad de la API.
-* **Gestión Segura de Contraseñas:** Las contraseñas de los usuarios se almacenan de forma segura utilizando el algoritmo de hashing adaptativo **BCrypt**, que incluye salting automático para proteger contra ataques de fuerza bruta y tablas arcoíris.
-* **Autorización Basada en Roles (RBAC):** Control de acceso granular a los endpoints de la API mediante roles de usuario definidos (`Admin`, `Manager`, `Viewer`). Los roles se asignan durante el registro y se validan con el atributo `[Authorize(Roles = "")]` en los controladores y métodos de acción.
-* **Validación de Roles Robusta:** Se utiliza una validación personalizada en los DTOs para asegurar que los valores de rol proporcionados en las solicitudes correspondan a roles válidos y definidos en el sistema.
+* **Autenticación Basada en Tokens JWT:** Flujo de autenticación seguro con JWT, manejando roles como strings para legibilidad.
+* **Gestión Segura de Contraseñas:** Contraseñas almacenadas con hashing **BCrypt** (salting automático) para protección contra ataques.
+* **Autorización Basada en Roles (RBAC):** Control de acceso granular a endpoints mediante roles (`Admin`, `Manager`, `Viewer`), asignados en el registro y validados con `[Authorize(Roles = "")]`.
+* **Validación de Roles Robusta:** Se utiliza una validación personalizada en los DTOs para asegurar que los valores de rol proporcionados correspondan a roles válidos.
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -94,11 +90,10 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 
 ### 🔑 Autenticación y Gestión de Tokens
 
-* Tu API requiere autenticación JWT para la mayoría de los endpoints protegidos. La colección de Insomnia ya está configurada para automatizar este proceso:
-    1.  Abre la solicitud `POST /api/auth/login` dentro de la carpeta `Auth`.
-    2.  Envía la solicitud con las credenciales de un usuario existente (ej. `admin@example.com` con su contraseña).
-    3.  **Gestión Automática del Token:** Todas las demás solicitudes protegidas en las carpetas `Employees` y `Profiles` tienen configurado un **Bearer Token** que **extrae automáticamente el JWT** de la respuesta exitosa del login. Esto significa que no necesitas copiar y pegar el token manualmente cada vez que expire o inicies sesión.
-    4.  Simplemente ejecuta el `Login` cuando necesites un token fresco, y las demás solicitudes lo usarán de forma transparente.
+* Tu API requiere autenticación JWT para la mayoría de los endpoints. La colección de Insomnia automatiza la gestión de tokens:
+    1.  Realiza un `POST` a `/api/auth/login` con credenciales de usuario.
+    2.  El **Bearer Token** se extrae automáticamente de la respuesta del login y se aplica a las demás solicitudes protegidas (`Employees`, `Profiles`, `Users`).
+    3.  Ejecuta el `Login` cuando necesites un token fresco.
 
 ### 🔗 Descripción General de Endpoints
 
@@ -155,12 +150,27 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 * **`DELETE /profile/delete/{id}`**
     * **Descripción:** Elimina un perfil por su ID. Requiere autenticación con rol `Admin` o `Manager`.
 
+#### 👤 Usuarios (`/User`)
+
+* **`GET /user/getall`**
+    * **Descripción:** Recupera una lista paginada y filtrada de usuarios. Requiere autenticación con rol `Admin`.
+    * **Parámetros de Paginación/Ordenamiento (genéricos - `QueryParamsDto`):**
+        * `QueryParams.PageNumber`, `QueryParams.PageSize`, `QueryParams.SortBy` (ej. `id`, `email`, `role`), `QueryParams.Order`.
+    * **Parámetros de Filtrado (específicos de usuario):**
+        * `Email`: Filtra por el email del usuario.
+        * `Role`: Filtra por el rol del usuario (`Viewer`, `Manager`, `Admin`).
+* **`GET /user/getbyid/{id}`**
+    * **Descripción:** Recupera un usuario por su ID. Requiere autenticación con rol `Admin`.
+* **`PUT /user/update/{id}`**
+    * **Descripción:** Actualiza un usuario existente. El `id` en la URL debe coincidir con el `Id` en el cuerpo de la petición. Requiere autenticación con rol `Admin`.
+* **`DELETE /user/delete/{id}`**
+    * **Descripción:** Elimina un usuario por su ID. Requiere autenticación con rol `Admin`.
+
 ## 🌟 Próximas Mejoras
 
 * Mejoras en el registro (logging) y manejo de errores.
 * Implementación de pruebas unitarias y de integración.
 * Documentación de API con Swagger/OpenAPI.
-* **Gestión de Usuarios (para administradores):** Crear endpoints para que los usuarios con rol 'Admin' puedan listar, ver, editar y eliminar otras cuentas de usuario.
 
 ## 📝 Autoría
 
