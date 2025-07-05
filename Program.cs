@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
 using crud_api.Common;
@@ -6,6 +7,7 @@ using crud_api.Entities;
 using crud_api.Services;
 using crud_api.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -23,7 +25,7 @@ builder.Services.AddAuthentication(config =>
 {
     config.RequireHttpsMetadata = false;
     config.SaveToken = true;
-    
+
     var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
     var keyBytes = Encoding.UTF8.GetBytes(jwtSettings!.SecretKey);
 
@@ -41,10 +43,7 @@ builder.Services.AddAuthentication(config =>
 });
 
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -61,6 +60,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.MapOpenApi();
 
     using (var scope = app.Services.CreateScope())
@@ -81,9 +81,35 @@ if (app.Environment.IsDevelopment())
         }
     }
 }
+else
+{
+    app.UseExceptionHandler(errorApp =>
+    {
+        errorApp.Run(async context =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
+
+            var exceptionHandlerPathFeature =
+                context.Features.Get<IExceptionHandlerPathFeature>();
+
+            if (exceptionHandlerPathFeature?.Error is Exception ex)
+            {
+                var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                logger.LogError(ex, "An unhandled exception occurred: {ErrorMessage}", ex.Message);
+
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    Status = "Error",
+                    Message = "An unexpected error occurred. Please try again later."
+                });
+            }
+        });
+    });
+}
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
