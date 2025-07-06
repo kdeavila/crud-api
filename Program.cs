@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using crud_api.Common;
 using crud_api.Context;
+using crud_api.DTOs.Common;
 using crud_api.Entities;
 using crud_api.Services;
 using crud_api.Settings;
@@ -96,14 +97,15 @@ else
             if (exceptionHandlerPathFeature?.Error is Exception ex)
             {
                 var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
                 logger.LogError(ex, "An unhandled exception occurred: {ErrorMessage}", ex.Message);
 
-                await context.Response.WriteAsJsonAsync(new
+                var errorResponse = new ErrorResponseDto
                 {
                     Status = "Error",
                     Message = "An unexpected error occurred. Please try again later."
-                });
+                };
+                
+                await context.Response.WriteAsJsonAsync(errorResponse);
             }
         });
     });
