@@ -112,6 +112,13 @@ public class UserService(AppDbContext context)
 
     public async Task<ServiceResult<UserGetDto>> Update(int id, UserUpdateDto userUpdateDto)
     {
+        if (id != userUpdateDto.Id)
+            return new ServiceResult<UserGetDto>
+            {
+                Status = ServiceResultStatus.InvalidInput,
+                Message = "Id in path and body do not match."
+            };
+
         var dbUser = await _context.Users
             .Where(u => u.Id == id)
             .FirstOrDefaultAsync();
