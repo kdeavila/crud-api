@@ -34,13 +34,12 @@ public class EmployeeController(EmployeeService employeeService) : BaseControlle
     public async Task<IActionResult> Create(EmployeeCreateDto employeeCreateDto)
     {
         var serviceResult = await _employeeService.Create(employeeCreateDto);
-        
-        if (serviceResult.Status == ServiceResultStatus.Created)
-        {
-            return ProcessServiceResultForCreate(serviceResult, nameof(GetById), new { id = serviceResult.Data.Id });
-        }
-        
-        return ProcessServiceResult(serviceResult);
+
+        return serviceResult.Status == ServiceResultStatus.Created
+            ? ProcessServiceResultForCreate(serviceResult, nameof(GetById),
+                new { id = serviceResult.Data!.Id }
+            )
+            : ProcessServiceResult(serviceResult);
     }
 
     [Authorize(Roles = "Admin, Editor")]

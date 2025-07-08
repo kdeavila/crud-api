@@ -44,7 +44,7 @@ public class ProfileService(AppDbContext context)
         query = query
             .Skip((profileQueryParams.QueryParams.PageNumber - 1) * profileQueryParams.QueryParams.PageSize)
             .Take(profileQueryParams.QueryParams.PageSize);
-        
+
         var paginatedProfiles = await query
             .Select(p => new ProfileGetDto
             {
@@ -60,13 +60,13 @@ public class ProfileService(AppDbContext context)
             PageNumber = profileQueryParams.QueryParams.PageNumber,
             PageSize = profileQueryParams.QueryParams.PageSize
         };
-        
+
         var result = new ServiceResult<PaginatedResultDto<ProfileGetDto>>
         {
             Data = paginatedResult,
             Status = ServiceResultStatus.Success
         };
-        
+
         return result;
     }
 
@@ -81,12 +81,13 @@ public class ProfileService(AppDbContext context)
             })
             .FirstOrDefaultAsync();
 
-        if (profileDto is null) return new ServiceResult<ProfileGetDto>
-        {
-            Status = ServiceResultStatus.NotFound,
-            Message = $"Profile with id {id} does not exist."
-        };
-        
+        if (profileDto is null)
+            return new ServiceResult<ProfileGetDto>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"Profile with id {id} does not exist."
+            };
+
         return new ServiceResult<ProfileGetDto>
         {
             Data = profileDto,
@@ -130,6 +131,13 @@ public class ProfileService(AppDbContext context)
 
     public async Task<ServiceResult<ProfileGetDto>> Update(int id, ProfileUpdateDto profileUpdateDto)
     {
+        if (id != profileUpdateDto.Id)
+            return new ServiceResult<ProfileGetDto>
+            {
+                Status = ServiceResultStatus.InvalidInput,
+                Message = "Id in path and body do not match."
+            };
+
         var dbProfile = await _context.Profiles
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
@@ -175,15 +183,16 @@ public class ProfileService(AppDbContext context)
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
 
-        if (dbProfile is null) return new ServiceResult<bool>
-        {
-            Status = ServiceResultStatus.NotFound,
-            Message = $"Profile with id {id} does not exist."
-        };
+        if (dbProfile is null)
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.NotFound,
+                Message = $"Profile with id {id} does not exist."
+            };
 
         _context.Profiles.Remove(dbProfile);
         await _context.SaveChangesAsync();
-        
+
         return new ServiceResult<bool>
         {
             Status = ServiceResultStatus.Success,

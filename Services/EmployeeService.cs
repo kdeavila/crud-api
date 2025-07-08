@@ -137,16 +137,15 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
     {
         try
         {
-            // var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeCreateDto.IdProfile);
-            //
-            // if (!profileExists)
-            // {
-            //     return new ServiceResult<EmployeeGetDto>
-            //     {
-            //         Status = ServiceResultStatus.InvalidInput,
-            //         Message = $"Profile with id {employeeCreateDto.IdProfile} does not exist"
-            //     };
-            // }
+            var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeCreateDto.IdProfile);
+            if (!profileExists)
+            {
+                return new ServiceResult<EmployeeGetDto>
+                {
+                    Status = ServiceResultStatus.InvalidInput,
+                    Message = $"Profile with id {employeeCreateDto.IdProfile} does not exist"
+                };
+            }
 
             var dbEmployee = new Employee
             {
@@ -184,7 +183,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
             {
                 if (sqlEx.Number is 2627 or 2601)
                 {
-                    _logger.LogWarning(dbEx, "DbUpdateException: Unique constraint violation during employee creation. Details: {SqlErrorMessage}", sqlEx.Message);
+                    _logger.LogWarning(dbEx,
+                        "DbUpdateException: Unique constraint violation during employee creation. Details: {SqlErrorMessage}",
+                        sqlEx.Message);
                     return new ServiceResult<EmployeeGetDto>
                     {
                         Status = ServiceResultStatus.Conflict,
@@ -194,7 +195,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                 }
                 else if (sqlEx.Number is 547)
                 {
-                    _logger.LogWarning(dbEx, "DbUpdateException: Foreign key violation during employee creation. Details: {SqlErrorMessage}", sqlEx.Message);
+                    _logger.LogWarning(dbEx,
+                        "DbUpdateException: Foreign key violation during employee creation. Details: {SqlErrorMessage}",
+                        sqlEx.Message);
                     return new ServiceResult<EmployeeGetDto>
                     {
                         Status = ServiceResultStatus.InvalidInput,
@@ -203,7 +206,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                 }
                 else
                 {
-                    _logger.LogError(dbEx, "DbUpdateException: An unhandled SQL error occurred during employee creation. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}", sqlEx.Number, sqlEx.Message);
+                    _logger.LogError(dbEx,
+                        "DbUpdateException: An unhandled SQL error occurred during employee creation. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                        sqlEx.Number, sqlEx.Message);
                     return new ServiceResult<EmployeeGetDto>
                     {
                         Status = ServiceResultStatus.Error,
@@ -213,7 +218,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
             }
             else
             {
-                _logger.LogError(dbEx, "DbUpdateException: An unexpected database update error occurred during employee creation. Message: {DbUpdateMessage}", dbEx.Message);
+                _logger.LogError(dbEx,
+                    "DbUpdateException: An unexpected database update error occurred during employee creation. Message: {DbUpdateMessage}",
+                    dbEx.Message);
                 return new ServiceResult<EmployeeGetDto>
                 {
                     Status = ServiceResultStatus.Error,
@@ -227,6 +234,13 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
     {
         if (employeeUpdateDto.IdProfile.HasValue)
         {
+            if (id != employeeUpdateDto.Id)
+                return new ServiceResult<EmployeeGetDto>
+                {
+                    Status = ServiceResultStatus.InvalidInput,
+                    Message = "Id in path and body do not match."
+                };
+
             var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeUpdateDto.IdProfile.Value);
 
             if (!profileExists)
