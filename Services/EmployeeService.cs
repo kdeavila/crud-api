@@ -5,7 +5,6 @@ using crud_api.DTOs.Employee;
 using crud_api.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace crud_api.Services;
 
@@ -60,7 +59,6 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                     ? query.OrderByDescending(e => e.ProfileReference!.Name)
                     : query.OrderBy(e => e.ProfileReference!.Name);
                 break;
-            case "id":
             default:
                 query = (orderLower == "desc")
                     ? query.OrderByDescending(e => e.Id)
@@ -177,43 +175,38 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
         }
         catch (DbUpdateException dbEx)
         {
-            var sqlEx = dbEx.InnerException as SqlException;
-
-            if (sqlEx != null)
+            if (dbEx.InnerException is SqlException sqlEx)
             {
-                if (sqlEx.Number is 2627 or 2601)
+                switch (sqlEx.Number)
                 {
-                    _logger.LogWarning(dbEx,
-                        "DbUpdateException: Unique constraint violation during employee creation. Details: {SqlErrorMessage}",
-                        sqlEx.Message);
-                    return new ServiceResult<EmployeeGetDto>
-                    {
-                        Status = ServiceResultStatus.Conflict,
-                        Message =
-                            "An employee with the same unique identifier (e.g., name if configured) already exists."
-                    };
-                }
-                else if (sqlEx.Number is 547)
-                {
-                    _logger.LogWarning(dbEx,
-                        "DbUpdateException: Foreign key violation during employee creation. Details: {SqlErrorMessage}",
-                        sqlEx.Message);
-                    return new ServiceResult<EmployeeGetDto>
-                    {
-                        Status = ServiceResultStatus.InvalidInput,
-                        Message = $"The provided profile ID ({employeeCreateDto.IdProfile}) does not exist."
-                    };
-                }
-                else
-                {
-                    _logger.LogError(dbEx,
-                        "DbUpdateException: An unhandled SQL error occurred during employee creation. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
-                        sqlEx.Number, sqlEx.Message);
-                    return new ServiceResult<EmployeeGetDto>
-                    {
-                        Status = ServiceResultStatus.Error,
-                        Message = "An unexpected database error occurred. Please try again later."
-                    };
+                    case 2627 or 2601:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException: Unique constraint violation during employee creation. Details: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message =
+                                "An employee with the same unique identifier (e.g., name if configured) already exists."
+                        };
+                    case 547:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException: Foreign key violation during employee creation. Details: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.InvalidInput,
+                            Message = $"The provided profile ID ({employeeCreateDto.IdProfile}) does not exist."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException: An unhandled SQL error occurred during employee creation. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred. Please try again later."
+                        };
                 }
             }
             else
@@ -232,30 +225,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
 
     public async Task<ServiceResult<EmployeeGetDto>> Update(int id, EmployeeUpdateDto employeeUpdateDto)
     {
-        if (employeeUpdateDto.IdProfile.HasValue)
-        {
-            if (id != employeeUpdateDto.Id)
-                return new ServiceResult<EmployeeGetDto>
-                {
-                    Status = ServiceResultStatus.InvalidInput,
-                    Message = "Id in path and body do not match."
-                };
-
-            var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeUpdateDto.IdProfile.Value);
-
-            if (!profileExists)
-            {
-                return new ServiceResult<EmployeeGetDto>
-                {
-                    Status = ServiceResultStatus.InvalidInput,
-                    Message = $"Profile with id {employeeUpdateDto.IdProfile.Value} does not exist"
-                };
-            }
-        }
-
         var dbEmployee = await _context.Employees
-            .Where(e => e.Id == id)
-            .FirstOrDefaultAsync();
+            .Include(e => e.ProfileReference)
+            .FirstOrDefaultAsync(e => e.Id == id);
 
         if (dbEmployee is null)
         {
@@ -266,38 +238,107 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
             };
         }
 
-        if (employeeUpdateDto.FullName != null)
+        if (id != employeeUpdateDto.Id)
         {
-            dbEmployee.FullName = employeeUpdateDto.FullName;
+            return new ServiceResult<EmployeeGetDto>
+            {
+                Status = ServiceResultStatus.InvalidInput,
+                Message = "Id in path and body do not match."
+            };
         }
 
-        if (employeeUpdateDto.Salary.HasValue)
+        try
         {
-            dbEmployee.Salary = employeeUpdateDto.Salary.Value;
+            var profileExists = await _context.Profiles.AnyAsync(p => p.Id == employeeUpdateDto.IdProfile);
+            if (!profileExists)
+            {
+                return new ServiceResult<EmployeeGetDto>
+                {
+                    Status = ServiceResultStatus.InvalidInput,
+                    Message = $"Profile with id {employeeUpdateDto.IdProfile} does not exist"
+                };
+            }
+
+            if (employeeUpdateDto.FullName != null)
+            {
+                dbEmployee.FullName = employeeUpdateDto.FullName;
+            }
+
+            if (employeeUpdateDto.Salary.HasValue)
+            {
+                dbEmployee.Salary = employeeUpdateDto.Salary.Value;
+            }
+
+            if (employeeUpdateDto.IdProfile.HasValue)
+            {
+                dbEmployee.IdProfile = employeeUpdateDto.IdProfile.Value;
+            }
+
+            _context.Employees.Update(dbEmployee);
+            await _context.SaveChangesAsync();
+
+            var updatedEmployeeDto = new EmployeeGetDto
+            {
+                Id = dbEmployee.Id,
+                FullName = dbEmployee.FullName,
+                Salary = dbEmployee.Salary,
+                IdProfile = dbEmployee.IdProfile,
+                NameProfile = dbEmployee.ProfileReference?.Name
+            };
+
+            return new ServiceResult<EmployeeGetDto>
+            {
+                Status = ServiceResultStatus.Success,
+                Data = updatedEmployeeDto
+            };
         }
-
-        if (employeeUpdateDto.IdProfile.HasValue)
+        catch (DbUpdateException dbEx)
         {
-            dbEmployee.IdProfile = employeeUpdateDto.IdProfile.Value;
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 2627 or 2601:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Update): Unique constraint violation. SQL Error: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message = "An employee with the same unique identifier already exists."
+                        };
+                    case 547:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Update): Foreign key violation. SQL Error: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.InvalidInput,
+                            Message = $"The provided profile ID ({employeeUpdateDto.IdProfile}) does not exist."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException (Update): An unhandled SQL error occurred. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<EmployeeGetDto>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred during update. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException (Update): An unexpected database update error occurred. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<EmployeeGetDto>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred during update. Please try again later."
+                };
+            }
         }
-
-        await _context.SaveChangesAsync();
-
-        var updatedEmployeeDto = new EmployeeGetDto
-        {
-            Id = dbEmployee.Id,
-            FullName = dbEmployee.FullName,
-            Salary = dbEmployee.Salary,
-            IdProfile = dbEmployee.IdProfile,
-            NameProfile = await _context.Profiles.Where(p => p.Id == dbEmployee.IdProfile).Select(p => p.Name)
-                .FirstOrDefaultAsync()
-        };
-
-        return new ServiceResult<EmployeeGetDto>
-        {
-            Status = ServiceResultStatus.Success,
-            Data = updatedEmployeeDto
-        };
     }
 
     public async Task<ServiceResult<bool>> Delete(int id)

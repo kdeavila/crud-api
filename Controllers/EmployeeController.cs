@@ -28,7 +28,7 @@ public class EmployeeController(EmployeeService employeeService) : BaseControlle
         var serviceResult = await _employeeService.GetById(id);
         return ProcessServiceResult(serviceResult);
     }
-
+    
     [Authorize(Roles = "Admin, Editor")]
     [HttpPost("create")]
     public async Task<IActionResult> Create(EmployeeCreateDto employeeCreateDto)
