@@ -9,5 +9,6 @@ public enum ServiceResultStatus
     Unauthorized,
     Forbidden,
     Conflict,
-    Error
+    Error,
+    Deleted
 }

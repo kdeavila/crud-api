@@ -14,6 +14,7 @@ public class BaseController : ControllerBase
         {
             ServiceResultStatus.Success => Ok(serviceResult.Data),
             ServiceResultStatus.Created => StatusCode(201, serviceResult.Data),
+            ServiceResultStatus.Deleted => NoContent(),
 
             ServiceResultStatus.InvalidInput => BadRequest(new ErrorResponseDto
                 { Status = serviceResult.Status.ToString(), Message = serviceResult.Message }),
@@ -23,7 +24,7 @@ public class BaseController : ControllerBase
                 { Status = serviceResult.Status.ToString(), Message = serviceResult.Message }),
             ServiceResultStatus.Unauthorized => Unauthorized(new ErrorResponseDto
                 { Status = serviceResult.Status.ToString(), Message = serviceResult.Message }),
-
+            
             ServiceResultStatus.Forbidden => Forbid(),
 
             _ => StatusCode(500,

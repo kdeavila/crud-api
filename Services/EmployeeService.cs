@@ -370,7 +370,7 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
 
             return new ServiceResult<bool>
             {
-                Status = ServiceResultStatus.Success,
+                Status = ServiceResultStatus.Deleted,
                 Data = true
             };
         }

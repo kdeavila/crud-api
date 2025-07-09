@@ -195,7 +195,7 @@ public class ProfileService(AppDbContext context)
 
         return new ServiceResult<bool>
         {
-            Status = ServiceResultStatus.Success,
+            Status = ServiceResultStatus.Deleted,
             Data = true
         };
     }

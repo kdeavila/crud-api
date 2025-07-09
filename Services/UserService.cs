@@ -189,7 +189,7 @@ public class UserService(AppDbContext context)
 
         var result = new ServiceResult<bool>
         {
-            Status = ServiceResultStatus.Success,
+            Status = ServiceResultStatus.Deleted,
             Data = true
         };
 
