@@ -169,7 +169,7 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
 
             return new ServiceResult<EmployeeGetDto>
             {
-                Status = ServiceResultStatus.Success,
+                Status = ServiceResultStatus.Created,
                 Data = createdEmployeeDto
             };
         }
@@ -339,6 +339,15 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                 };
             }
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unforeseen error occurred in EmployeeService.Update for Id: {Id}. Data: {@EmployeeUpdateDto}", id, employeeUpdateDto);
+            return new ServiceResult<EmployeeGetDto>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected server error occurred during update."
+            };
+        }
     }
 
     public async Task<ServiceResult<bool>> Delete(int id)
@@ -354,13 +363,65 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                 Message = $"Employee with id {id} not found"
             };
 
-        _context.Employees.Remove(dbEmployee);
-        await _context.SaveChangesAsync();
-
-        return new ServiceResult<bool>
+        try
         {
-            Status = ServiceResultStatus.Success,
-            Data = true
-        };
+            _context.Employees.Remove(dbEmployee);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.Success,
+                Data = true
+            };
+        }
+        catch (DbUpdateException dbEx)
+        {
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                if (sqlEx.Number == 547)
+                {
+                    _logger.LogWarning(
+                        sqlEx,
+                        "DbUpdateException (Delete): Foreign key violation. SQL Error {SqlErrorMessage}",
+                        sqlEx.Message);
+                    return new ServiceResult<bool>
+                    {
+                        Status = ServiceResultStatus.Conflict,
+                        Message = "The employee cannot be deleted because it is referenced by another entity."
+                    };
+                }
+                else
+                {
+                    _logger.LogError(dbEx,
+                        "DbUpdateException (Delete): An unhandled SQL error occurred. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                        sqlEx.Number, sqlEx.Message);
+                    return new ServiceResult<bool>
+                    {
+                        Status = ServiceResultStatus.Error,
+                        Message = "An unexpected database error occurred during deletion. Please try again later."
+                    };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException (Update): An unexpected database update error occurred. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<bool>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred during update. Please try again later."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unforeseen error occurred in EmployeeService.Delete for Id: {Id}.", id);
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected server error occurred during deletion."
+            };
+        }
     }
 }
