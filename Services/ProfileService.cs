@@ -3,13 +3,15 @@ using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.DTOs.Profile;
 using crud_api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class ProfileService(AppDbContext context)
+public class ProfileService(AppDbContext context, ILogger<ProfileService> logger)
 {
     private readonly AppDbContext _context = context;
+    private readonly ILogger<ProfileService> _logger = logger;
 
     public async Task<ServiceResult<PaginatedResultDto<ProfileGetDto>>> GetAllPaginatedAndFiltered(
         ProfileQueryParams profileQueryParams)
@@ -31,7 +33,6 @@ public class ProfileService(AppDbContext context)
                     ? query.OrderByDescending(p => p.Name)
                     : query.OrderBy(p => p.Name);
                 break;
-            case "id":
             default:
                 query = (orderLower == "desc")
                     ? query.OrderByDescending(p => p.Id)
@@ -97,36 +98,85 @@ public class ProfileService(AppDbContext context)
 
     public async Task<ServiceResult<ProfileGetDto>> Create(ProfileCreateDto profileCreateDto)
     {
-        var nameExists = await _context.Profiles.AnyAsync(p => p.Name == profileCreateDto.Name);
-
-        if (nameExists)
+        try
         {
+            var nameExists = await _context.Profiles.AnyAsync(p => p.Name == profileCreateDto.Name);
+            if (nameExists)
+            {
+                return new ServiceResult<ProfileGetDto>
+                {
+                    Status = ServiceResultStatus.Conflict,
+                    Message = $"Profile with name {profileCreateDto.Name} already exists"
+                };
+            }
+
+            var dbProfile = new Profile
+            {
+                Name = profileCreateDto.Name
+            };
+
+            await _context.Profiles.AddAsync(dbProfile);
+            await _context.SaveChangesAsync();
+
+            var createdProfileDto = new ProfileGetDto
+            {
+                Id = dbProfile.Id,
+                Name = dbProfile.Name
+            };
+
             return new ServiceResult<ProfileGetDto>
             {
-                Status = ServiceResultStatus.Conflict,
-                Message = $"Profile with name {profileCreateDto.Name} already exists"
+                Status = ServiceResultStatus.Created,
+                Data = createdProfileDto
             };
         }
-
-        var dbProfile = new Profile
+        catch (DbUpdateException dbEx)
         {
-            Name = profileCreateDto.Name
-        };
-
-        await _context.Profiles.AddAsync(dbProfile);
-        await _context.SaveChangesAsync();
-
-        var createdProfileDto = new ProfileGetDto
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 2627 or 2601:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException: Unique constraint violation during profile creation. Details: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<ProfileGetDto>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message = "A profile with the same unique identifier already exists."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException: An unhandled SQL error occurred during profile creation. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<ProfileGetDto>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException: An unexpected database update error occurred during profile creation. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<ProfileGetDto>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred. Please try again later."
+                };
+            }
+        }
+        catch (Exception ex)
         {
-            Id = dbProfile.Id,
-            Name = dbProfile.Name
-        };
-
-        return new ServiceResult<ProfileGetDto>
-        {
-            Status = ServiceResultStatus.Success,
-            Data = createdProfileDto
-        };
+            _logger.LogError(ex, "An unhandled exception occurred during profile creation.");
+            return new ServiceResult<ProfileGetDto>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
     }
 
     public async Task<ServiceResult<ProfileGetDto>> Update(int id, ProfileUpdateDto profileUpdateDto)
