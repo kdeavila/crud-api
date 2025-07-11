@@ -188,65 +188,165 @@ public class ProfileService(AppDbContext context, ILogger<ProfileService> logger
                 Message = "Id in path and body do not match."
             };
 
-        var dbProfile = await _context.Profiles
-            .Where(p => p.Id == id)
-            .FirstOrDefaultAsync();
-
-        if (dbProfile is null)
+        try
         {
+            var dbProfile = await _context.Profiles
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (dbProfile is null)
+            {
+                return new ServiceResult<ProfileGetDto>
+                {
+                    Status = ServiceResultStatus.NotFound,
+                    Message = $"Profile with id {id} does not exist."
+                };
+            }
+
+            var nameExists = await _context.Profiles.AnyAsync(p => p.Name == profileUpdateDto.Name && p.Id != id);
+            if (nameExists)
+            {
+                return new ServiceResult<ProfileGetDto>
+                {
+                    Status = ServiceResultStatus.Conflict,
+                    Message = $"Profile with name {profileUpdateDto.Name} already exists"
+                };
+            }
+
+            dbProfile.Name = profileUpdateDto.Name;
+            await _context.SaveChangesAsync();
+
+            var updatedProfileDto = new ProfileGetDto
+            {
+                Id = dbProfile.Id,
+                Name = dbProfile.Name
+            };
+
             return new ServiceResult<ProfileGetDto>
             {
-                Status = ServiceResultStatus.NotFound,
-                Message = $"Profile with id {id} does not exist."
+                Status = ServiceResultStatus.Success,
+                Data = updatedProfileDto
             };
         }
-
-        var nameExists = await _context.Profiles.AnyAsync(p => p.Name == profileUpdateDto.Name && p.Id != id);
-        if (nameExists)
+        catch (DbUpdateException dbEx)
         {
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 2627 or 2601:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Update): Unique constraint violation during profile update. SQL Error: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<ProfileGetDto>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message = "A profile with the same unique identifier already exists."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException (Update): An unhandled SQL error occurred during profile update. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<ProfileGetDto>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException: An unexpected database update error occurred during profile update. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<ProfileGetDto>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred. Please try again later."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unhandled exception occurred during profile update.");
             return new ServiceResult<ProfileGetDto>
             {
-                Status = ServiceResultStatus.Conflict,
-                Message = $"Profile with name {profileUpdateDto.Name} already exists"
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected error occurred. Please try again later."
             };
         }
-
-        dbProfile.Name = profileUpdateDto.Name;
-        await _context.SaveChangesAsync();
-
-        var updatedProfileDto = new ProfileGetDto
-        {
-            Id = dbProfile.Id,
-            Name = dbProfile.Name
-        };
-
-        return new ServiceResult<ProfileGetDto>
-        {
-            Status = ServiceResultStatus.Success,
-            Data = updatedProfileDto
-        };
     }
 
     public async Task<ServiceResult<bool>> Delete(int id)
     {
-        var dbProfile = await _context.Profiles
-            .Where(p => p.Id == id)
-            .FirstOrDefaultAsync();
+        try
+        {
+            var dbProfile = await _context.Profiles
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
 
-        if (dbProfile is null)
+            if (dbProfile is null)
+                return new ServiceResult<bool>
+                {
+                    Status = ServiceResultStatus.NotFound,
+                    Message = $"Profile with id {id} does not exist."
+                };
+
+            _context.Profiles.Remove(dbProfile);
+            await _context.SaveChangesAsync();
+
             return new ServiceResult<bool>
             {
-                Status = ServiceResultStatus.NotFound,
-                Message = $"Profile with id {id} does not exist."
+                Status = ServiceResultStatus.Deleted,
+                Data = true
             };
-
-        _context.Profiles.Remove(dbProfile);
-        await _context.SaveChangesAsync();
-
-        return new ServiceResult<bool>
+        }
+        catch (DbUpdateException dbEx)
         {
-            Status = ServiceResultStatus.Deleted,
-            Data = true
-        };
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 547:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Delete): Foreign key violation during profile deletion. Details: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<bool>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message = "The profile cannot be deleted because it is referenced by other entities." 
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException (Delete): An unhandled SQL error occurred during profile deletion. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<bool>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException (Delete): An unexpected database update error occurred during profile deletion. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<bool>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred during update. Please try again later."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unhandled exception occurred during profile deletion.");
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
     }
 }

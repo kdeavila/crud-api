@@ -19,14 +19,14 @@ collection:
         meta:
           id: req_ea31be027eab4da8a0e87e5da2b13bc0
           created: 1750655745206
-          modified: 1751494394501
+          modified: 1752083120006
           isPrivate: false
           description: ""
           sortKey: -1750698577060
         method: GET
         parameters:
           - name: queryparams.pagenumber
-            value: "1"
+            value: "2"
             id: pair_93a44b4a22dc496297a121d0423bb77b
             disabled: true
           - id: pair_4289c1a4cd574fd3a8d16f0386292a7a
@@ -51,17 +51,17 @@ collection:
             disabled: true
           - id: pair_24686c8513e446cabecbb582e71a4023
             name: idprofile
-            value: "2"
+            value: "14"
             description: ""
-            disabled: true
+            disabled: false
           - id: pair_24216aa2f7214fd9a3d4b25099fa9098
             name: minsalary
-            value: "23000"
+            value: "45000"
             description: ""
             disabled: true
           - id: pair_9d994b250e0248cab1e0e23545eac7f8
             name: maxsalary
-            value: "6800000"
+            value: "60000"
             description: ""
             disabled: true
         headers:
@@ -109,7 +109,7 @@ collection:
         meta:
           id: req_4d1ca0ed9fd9498f815940a5cf012dfb
           created: 1750655849966
-          modified: 1751434296280
+          modified: 1752083043754
           isPrivate: false
           description: ""
           sortKey: -1750698576860
@@ -118,9 +118,9 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"fullName": "Marco Peréz",
-            	"salary": 15000,
-            	"idProfile": 10
+            	"fullName": "José Muñoz Marin",
+            	"salary": 35000.20,
+            	"idProfile": 14
             }
         headers:
           - name: Content-Type
@@ -139,12 +139,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/update/15
+      - url: http://localhost:5190/api/employee/update/36
         name: Update
         meta:
           id: req_e23ff2139e294d6fbb9117e4f1c1972f
           created: 1750656201810
-          modified: 1751434309663
+          modified: 1752083177005
           isPrivate: false
           description: ""
           sortKey: -1750698576760
@@ -153,10 +153,10 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"id": 15,
+            	"id": 36,
             	"fullName": "Andrés Loaiza",
-            	"salary": 12750,
-            	"idProfile": 9
+            	"salary": 36000.20,
+            	"idProfile": 14
             }
         headers:
           - name: Content-Type
@@ -175,22 +175,17 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/17
+      - url: http://localhost:5190/api/employee/delete/36
         name: Delete
         meta:
           id: req_dd530ec96c1e43f39807b0dc8089cd99
           created: 1751493723740
-          modified: 1751494300611
+          modified: 1752083196339
           isPrivate: false
           description: ""
           sortKey: -1750698576610
         method: DELETE
-        body:
-          mimeType: application/json
-          text: ""
         headers:
-          - name: Content-Type
-            value: application/json
           - name: User-Agent
             value: insomnia/11.2.0
         authentication:
@@ -218,7 +213,7 @@ collection:
         meta:
           id: req_f95a0cdf4c214350bdd5d36eb48146cb
           created: 1750698665128
-          modified: 1751494351300
+          modified: 1751831313177
           isPrivate: false
           description: ""
           sortKey: -1750698577060
@@ -264,12 +259,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/profile/getbyid/8
+      - url: http://localhost:5190/api/profile/getbyid/15
         name: Get by ID
         meta:
           id: req_6745acc17f6f47d4b303a1151ea48c8b
           created: 1750698665132
-          modified: 1751434338949
+          modified: 1752083344121
           isPrivate: false
           description: ""
           sortKey: -1750698576960
@@ -294,7 +289,7 @@ collection:
         meta:
           id: req_e0ad42fe918d48778ce629e1d60a0648
           created: 1750698665137
-          modified: 1751434345669
+          modified: 1752083325747
           isPrivate: false
           description: ""
           sortKey: -1750698576860
@@ -322,12 +317,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/profile/update/11
+      - url: http://localhost:5190/api/profile/update/15
         name: Update
         meta:
           id: req_c292ac754a94439b93f9457a02a14ca2
           created: 1750698665141
-          modified: 1751434963717
+          modified: 1752083368963
           isPrivate: false
           description: ""
           sortKey: -1750698576760
@@ -336,8 +331,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            		"id": 11,
-            		"name": "Gerente de negocios"
+            		"id": 15,
+            		"name": "Product Manager"
             }
         headers:
           - name: Content-Type
@@ -356,12 +351,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/12
+      - url: http://localhost:5190/api/employee/delete/15
         name: Delete
         meta:
           id: req_8f3a4219cf7847c18b77352faad4ffec
           created: 1750698665145
-          modified: 1751494333463
+          modified: 1752083386032
           isPrivate: false
           description: ""
           sortKey: -1750698576660
@@ -394,7 +389,7 @@ collection:
         meta:
           id: req_14029c98dd2e45a19422c4c3ab87caa5
           created: 1751178009355
-          modified: 1751494281190
+          modified: 1752082335574
           isPrivate: false
           description: ""
           sortKey: -1751178024444
@@ -403,8 +398,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"email": "correo@correo.com",
-            	"password": "Slimmerancher123"
+            	"email": "admin@example.com",
+            	"password": "adminexample123!"
             }
         headers:
           - name: Content-Type
@@ -424,7 +419,7 @@ collection:
         meta:
           id: req_79b5f6689c6344e29b2227430b296dfc
           created: 1751178173331
-          modified: 1751494162717
+          modified: 1752082745434
           isPrivate: false
           description: ""
           sortKey: -1750938300752
@@ -433,8 +428,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"email": "correo@correo.com",
-            	"password": "Slimmerancher123",
+            	"email": "kdeavila.ts@gmail.com",
+            	"password": "admin123",
             	"role": "admin"
             }
         headers:
@@ -462,12 +457,12 @@ collection:
       sortKey: -1751494054371
       description: ""
     children:
-      - url: http://localhost:5190/api/user/delete/6
+      - url: http://localhost:5190/api/user/delete/2
         name: Delete
         meta:
           id: req_aec2953950ba491ca3288a5ea4964e39
           created: 1750656571586
-          modified: 1751494106830
+          modified: 1752082847275
           isPrivate: false
           description: ""
           sortKey: -1751494081205
@@ -538,12 +533,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/user/getbyid/6
+      - url: http://localhost:5190/api/user/getbyid/2
         name: Get by ID
         meta:
           id: req_54fcddbd3be54f21ae9438cc500e66f4
           created: 1751485696687
-          modified: 1751494175107
+          modified: 1752082764927
           isPrivate: false
           description: ""
           sortKey: -1751494081280
@@ -563,12 +558,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/user/update/9
+      - url: http://localhost:5190/api/user/update/2
         name: Update
         meta:
           id: req_a4b3c815e212472c91f43652922ad6f0
           created: 1751493715619
-          modified: 1751494110148
+          modified: 1752082830021
           isPrivate: false
           description: ""
           sortKey: -1751494081255
@@ -577,8 +572,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"id": 9,
-            	"email": "kda.csharp@gmail.com",
+            	"id": 2,
             	"role": "Admin"
             }
         headers:
