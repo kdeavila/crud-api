@@ -19,7 +19,7 @@ collection:
         meta:
           id: req_ea31be027eab4da8a0e87e5da2b13bc0
           created: 1750655745206
-          modified: 1752083120006
+          modified: 1752211653004
           isPrivate: false
           description: ""
           sortKey: -1750698577060
@@ -31,9 +31,9 @@ collection:
             disabled: true
           - id: pair_4289c1a4cd574fd3a8d16f0386292a7a
             name: queryparams.pagesize
-            value: "15"
+            value: "40"
             description: ""
-            disabled: true
+            disabled: false
           - id: pair_8ba313de9c7047de9b7e12a5110351d7
             name: queryparams.sortby
             value: salary
@@ -53,7 +53,7 @@ collection:
             name: idprofile
             value: "14"
             description: ""
-            disabled: false
+            disabled: true
           - id: pair_24216aa2f7214fd9a3d4b25099fa9098
             name: minsalary
             value: "45000"
@@ -109,7 +109,7 @@ collection:
         meta:
           id: req_4d1ca0ed9fd9498f815940a5cf012dfb
           created: 1750655849966
-          modified: 1752083043754
+          modified: 1752211633437
           isPrivate: false
           description: ""
           sortKey: -1750698576860
@@ -118,7 +118,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-            	"fullName": "José Muñoz Marin",
+            	"fullName": "Jayleth Xilena De la Hoz",
             	"salary": 35000.20,
             	"idProfile": 14
             }
@@ -175,12 +175,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/36
+      - url: http://localhost:5190/api/employee/delete/38
         name: Delete
         meta:
           id: req_dd530ec96c1e43f39807b0dc8089cd99
           created: 1751493723740
-          modified: 1752083196339
+          modified: 1752211643032
           isPrivate: false
           description: ""
           sortKey: -1750698576610
@@ -213,7 +213,7 @@ collection:
         meta:
           id: req_f95a0cdf4c214350bdd5d36eb48146cb
           created: 1750698665128
-          modified: 1751831313177
+          modified: 1752252394477
           isPrivate: false
           description: ""
           sortKey: -1750698577060
@@ -221,12 +221,12 @@ collection:
         parameters:
           - id: pair_230e7c78899843f28617c14e7f646cf6
             name: queryparams.pagenumber
-            value: "2"
+            value: "1"
             description: ""
             disabled: true
           - id: pair_0d3c3356114f4cef8e38b218b85e3f99
             name: queryparams.pagesize
-            value: "5"
+            value: "20"
             description: ""
             disabled: true
           - id: pair_3b36330a7e4b4daab5866195c77455fd
@@ -241,7 +241,7 @@ collection:
             disabled: true
           - id: pair_ef8f99bbfdc443b1827bbf2f35dd9d8e
             name: name
-            value: desarrollador
+            value: Developer
             description: ""
             disabled: true
         headers:
@@ -259,12 +259,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/profile/getbyid/15
+      - url: http://localhost:5190/api/profile/getbyid/1
         name: Get by ID
         meta:
           id: req_6745acc17f6f47d4b303a1151ea48c8b
           created: 1750698665132
-          modified: 1752083344121
+          modified: 1752251513948
           isPrivate: false
           description: ""
           sortKey: -1750698576960
@@ -289,7 +289,7 @@ collection:
         meta:
           id: req_e0ad42fe918d48778ce629e1d60a0648
           created: 1750698665137
-          modified: 1752083325747
+          modified: 1752252116115
           isPrivate: false
           description: ""
           sortKey: -1750698576860
@@ -298,7 +298,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-            		"name": "Product Manager"
+            		"name": "BLENTO"
             }
         headers:
           - name: Content-Type
@@ -317,12 +317,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/profile/update/15
+      - url: http://localhost:5190/api/profile/update/20
         name: Update
         meta:
           id: req_c292ac754a94439b93f9457a02a14ca2
           created: 1750698665141
-          modified: 1752083368963
+          modified: 1752252325721
           isPrivate: false
           description: ""
           sortKey: -1750698576760
@@ -331,8 +331,8 @@ collection:
           mimeType: application/json
           text: |-
             {
-            		"id": 15,
-            		"name": "Product Manager"
+            		"id": 20,
+            		"name": "Backend Developer"
             }
         headers:
           - name: Content-Type
@@ -351,12 +351,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: http://localhost:5190/api/employee/delete/15
+      - url: http://localhost:5190/api/profile/delete/20
         name: Delete
         meta:
           id: req_8f3a4219cf7847c18b77352faad4ffec
           created: 1750698665145
-          modified: 1752083386032
+          modified: 1752252346158
           isPrivate: false
           description: ""
           sortKey: -1750698576660
@@ -368,6 +368,27 @@ collection:
           type: bearer
           token: "{% response 'body', 'req_14029c98dd2e45a19422c4c3ab87caa5',
             'b64::JC5qd3Q=::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: ""
+        name: New Request
+        meta:
+          id: req_10696e5fbb2f4c15b0f1073adb31fadc
+          created: 1752251941834
+          modified: 1752251941834
+          isPrivate: false
+          description: ""
+          sortKey: -1752251941834
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.2.0
         settings:
           renderRequestBody: true
           encodeUrl: true
