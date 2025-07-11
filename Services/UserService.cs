@@ -2,13 +2,15 @@ using crud_api.Common;
 using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.DTOs.User;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class UserService(AppDbContext context)
+public class UserService(AppDbContext context, ILogger<UserService> logger)
 {
     private readonly AppDbContext _context = context;
+    private readonly ILogger<UserService> _logger = logger;
 
     public async Task<ServiceResult<PaginatedResultDto<UserGetDto>>> GetAllPaginatedAndFiltered(
         UserQueryParamsDto userQueryParamsDto)
@@ -40,7 +42,6 @@ public class UserService(AppDbContext context)
                     ? query.OrderByDescending(u => u.Role)
                     : query.OrderBy(u => u.Role);
                 break;
-            case "id":
             default:
                 query = (orderLower == "desc")
                     ? query.OrderByDescending(u => u.Id)
@@ -119,80 +120,175 @@ public class UserService(AppDbContext context)
                 Message = "Id in path and body do not match."
             };
 
-        var dbUser = await _context.Users
-            .Where(u => u.Id == id)
-            .FirstOrDefaultAsync();
-
-        if (dbUser is null)
+        try
         {
-            return new ServiceResult<UserGetDto>
+            var dbUser = await _context.Users
+                .Where(u => u.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (dbUser is null)
             {
-                Status = ServiceResultStatus.NotFound,
-                Message = $"User with id {id} not found"
-            };
-        }
-
-        if (userUpdateDto.Email != null)
-        {
-            var emailExists = await _context.Users
-                .AnyAsync(u => u.Email == userUpdateDto.Email && u.Id != id);
-
-            if (emailExists)
                 return new ServiceResult<UserGetDto>
                 {
-                    Status = ServiceResultStatus.Conflict,
-                    Message = $"Email {userUpdateDto.Email} already exists"
+                    Status = ServiceResultStatus.NotFound,
+                    Message = $"User with id {id} not found"
                 };
+            }
 
-            dbUser.Email = userUpdateDto.Email;
+            if (userUpdateDto.Email != null)
+            {
+                var emailExists = await _context.Users
+                    .AnyAsync(u => u.Email == userUpdateDto.Email && u.Id != id);
+
+                if (emailExists)
+                    return new ServiceResult<UserGetDto>
+                    {
+                        Status = ServiceResultStatus.Conflict,
+                        Message = $"Email {userUpdateDto.Email} already exists"
+                    };
+
+                dbUser.Email = userUpdateDto.Email;
+            }
+
+            if (userUpdateDto.Role.HasValue)
+            {
+                dbUser.Role = userUpdateDto.Role.Value;
+            }
+
+            await _context.SaveChangesAsync();
+            var updatedUserDto = new UserGetDto
+            {
+                Id = dbUser.Id,
+                Email = dbUser.Email,
+                Role = dbUser.Role
+            };
+
+            return new ServiceResult<UserGetDto>
+            {
+                Data = updatedUserDto,
+                Status = ServiceResultStatus.Success
+            };
         }
-
-        if (userUpdateDto.Role.HasValue)
+        catch (DbUpdateException dbEx)
         {
-            dbUser.Role = userUpdateDto.Role.Value;
+            if (dbEx.InnerException is SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 2627 or 2601:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Update): Unique constraint violation during user update. SQL Error: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<UserGetDto>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message = "A user with the same unique identifier already exists."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException (Update): An unhandled SQL error occurred during user update. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<UserGetDto>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException: An unexpected database update error occurred during user update. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<UserGetDto>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred. Please try again later."
+                };
+            }
         }
-
-        await _context.SaveChangesAsync();
-        var updatedUserDto = new UserGetDto
+        catch (Exception ex)
         {
-            Id = dbUser.Id,
-            Email = dbUser.Email,
-            Role = dbUser.Role
-        };
-
-        var result = new ServiceResult<UserGetDto>
-        {
-            Data = updatedUserDto,
-            Status = ServiceResultStatus.Success
-        };
-
-        return result;
+            _logger.LogError(ex, "An unhandled exception occurred during user update.");
+            return new ServiceResult<UserGetDto>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected error occurred. Please try again later."
+            };
+        }
     }
 
     public async Task<ServiceResult<bool>> Delete(int id)
     {
-        var dbUser = await _context.Users
-            .Where(u => u.Id == id)
-            .FirstOrDefaultAsync();
-
-        if (dbUser is null)
+        try
         {
+            var dbUser = await _context.Users
+                .Where(u => u.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (dbUser is null)
+                return new ServiceResult<bool>
+                {
+                    Status = ServiceResultStatus.NotFound,
+                    Message = $"User with id {id} not found."
+                };
+
+            _context.Users.Remove(dbUser);
+            await _context.SaveChangesAsync();
+
             return new ServiceResult<bool>
             {
-                Status = ServiceResultStatus.NotFound,
-                Message = $"User with id {id} not found"
+                Status = ServiceResultStatus.Deleted,
+                Data = true
             };
         }
-
-        _context.Users.Remove(dbUser);
-        await _context.SaveChangesAsync();
-
-        var result = new ServiceResult<bool>
+        catch (DbUpdateException dbEx)
         {
-            Status = ServiceResultStatus.Deleted,
-            Data = true
-        };
-
-        return result;
+            if (dbEx.InnerException is Microsoft.Data.SqlClient.SqlException sqlEx)
+            {
+                switch (sqlEx.Number)
+                {
+                    case 547:
+                        _logger.LogWarning(dbEx,
+                            "DbUpdateException (Delete): Foreign key violation during user deletion. SQL Error: {SqlErrorMessage}",
+                            sqlEx.Message);
+                        return new ServiceResult<bool>
+                        {
+                            Status = ServiceResultStatus.Conflict,
+                            Message =
+                                "The user cannot be deleted because it is referenced by other entities (e.g., employees, logs)."
+                        };
+                    default:
+                        _logger.LogError(dbEx,
+                            "DbUpdateException (Delete): An unhandled SQL error occurred during user deletion. SQL Error Number: {SqlErrorNumber}, Message: {SqlErrorMessage}",
+                            sqlEx.Number, sqlEx.Message);
+                        return new ServiceResult<bool>
+                        {
+                            Status = ServiceResultStatus.Error,
+                            Message = "An unexpected database error occurred during deletion. Please try again later."
+                        };
+                }
+            }
+            else
+            {
+                _logger.LogError(dbEx,
+                    "DbUpdateException (Delete): An unexpected database update error occurred during user deletion. Message: {DbUpdateMessage}",
+                    dbEx.Message);
+                return new ServiceResult<bool>
+                {
+                    Status = ServiceResultStatus.Error,
+                    Message = "An unexpected database error occurred during deletion. Please try again later."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unforeseen error occurred in UserService.Delete for Id: {Id}.", id);
+            return new ServiceResult<bool>
+            {
+                Status = ServiceResultStatus.Error,
+                Message = "An unexpected server error occurred during deletion."
+            };
+        }
     }
 }
