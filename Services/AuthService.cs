@@ -12,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class AuthService(AppDbContext context, IOptions<JwtSettings> jwtSettings)
+using crud_api.Interfaces;
+
+public class AuthService(AppDbContext context, IOptions<JwtSettings> jwtSettings) : IAuthService
 {
     private readonly AppDbContext _context = context;
     private readonly JwtSettings _jwtSettings = jwtSettings.Value;

@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace crud_api.Controllers;
 
+using crud_api.Interfaces;
+
 [Route("/api/[controller]")]
 [ApiController]
-public class AuthController(AuthService authService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost]
     [Route("login")]
