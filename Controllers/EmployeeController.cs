@@ -1,5 +1,6 @@
 using crud_api.Common;
 using crud_api.DTOs.Employee;
+using crud_api.Interfaces;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace crud_api.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
-public class EmployeeController(EmployeeService employeeService) : BaseController
+public class EmployeeController(IEmployeeService employeeService) : BaseController
 {
-    private readonly EmployeeService _employeeService = employeeService;
+    private readonly IEmployeeService  _employeeService = employeeService;
 
     [HttpGet("getall")]
     [Authorize(Roles = "Admin, Editor, Viewer")]

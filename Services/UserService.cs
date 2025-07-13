@@ -2,12 +2,13 @@ using crud_api.Common;
 using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.DTOs.User;
+using crud_api.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class UserService(AppDbContext context, ILogger<UserService> logger)
+public class UserService(AppDbContext context, ILogger<UserService> logger) : IUserService
 {
     private readonly AppDbContext _context = context;
     private readonly ILogger<UserService> _logger = logger;
@@ -244,7 +245,7 @@ public class UserService(AppDbContext context, ILogger<UserService> logger)
         }
         catch (DbUpdateException dbEx)
         {
-            if (dbEx.InnerException is Microsoft.Data.SqlClient.SqlException sqlEx)
+            if (dbEx.InnerException is SqlException sqlEx)
             {
                 switch (sqlEx.Number)
                 {

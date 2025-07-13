@@ -3,12 +3,13 @@ using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.DTOs.Employee;
 using crud_api.Entities;
+using crud_api.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logger)
+public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logger) : IEmployeeService
 {
     private readonly AppDbContext _context = context;
     private readonly ILogger<EmployeeService> _logger = logger;
@@ -341,7 +342,9 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unforeseen error occurred in EmployeeService.Update for Id: {Id}. Data: {@EmployeeUpdateDto}", id, employeeUpdateDto);
+            _logger.LogError(ex,
+                "An unforeseen error occurred in EmployeeService.Update for Id: {Id}. Data: {@EmployeeUpdateDto}", id,
+                employeeUpdateDto);
             return new ServiceResult<EmployeeGetDto>
             {
                 Status = ServiceResultStatus.Error,

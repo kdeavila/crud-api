@@ -5,6 +5,7 @@ using crud_api.Common;
 using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.Entities;
+using crud_api.Interfaces;
 using crud_api.Services;
 using crud_api.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,10 +52,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultString"));
 });
-builder.Services.AddScoped<ProfileService>();
-builder.Services.AddScoped<EmployeeService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
@@ -104,7 +105,7 @@ else
                     Status = "Error",
                     Message = "An unexpected error occurred. Please try again later."
                 };
-                
+
                 await context.Response.WriteAsJsonAsync(errorResponse);
             }
         });

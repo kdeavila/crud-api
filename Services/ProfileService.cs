@@ -3,12 +3,13 @@ using crud_api.Context;
 using crud_api.DTOs.Common;
 using crud_api.DTOs.Profile;
 using crud_api.Entities;
+using crud_api.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
 
-public class ProfileService(AppDbContext context, ILogger<ProfileService> logger)
+public class ProfileService(AppDbContext context, ILogger<ProfileService> logger) : IProfileService
 {
     private readonly AppDbContext _context = context;
     private readonly ILogger<ProfileService> _logger = logger;

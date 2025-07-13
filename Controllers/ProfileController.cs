@@ -1,5 +1,6 @@
 using crud_api.Common;
 using crud_api.DTOs.Profile;
+using crud_api.Interfaces;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace crud_api.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
-public class ProfileController(ProfileService profileService) : BaseController
+public class ProfileController(IProfileService profileService) : BaseController
 {
-    private readonly ProfileService _profileService = profileService;
+    private readonly IProfileService _profileService = profileService;
 
     [HttpGet("getall")]
     [Authorize(Roles = "Admin, Editor, Viewer")]

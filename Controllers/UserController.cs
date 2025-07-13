@@ -1,4 +1,5 @@
 using crud_api.DTOs.User;
+using crud_api.Interfaces;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,9 +8,9 @@ namespace crud_api.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
-public class UserController(UserService userService) : BaseController
+public class UserController(IUserService userService) : BaseController
 {
-    private readonly UserService _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [Authorize(Roles = "Admin")]
     [HttpGet("getall")]
