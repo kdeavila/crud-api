@@ -118,7 +118,6 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 ## 🌟 Próximas Mejoras
 
 * Implementación de pruebas unitarias y de integración.
-* Documentación de API con Swagger/OpenAPI.
 
 ## 📝 Autoría
 
