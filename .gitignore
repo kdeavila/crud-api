@@ -6,6 +6,57 @@
 # dotenv files
 .env
 
+# Build results
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.pdb
+*.tmp
+*.user
+*.suo
+*.vspscc
+*.vssscc
+*.local
+*.cache
+*.ncb
+*.sbr
+*.res
+*.pch
+*.lib
+*.obj
+*.aps
+*.bsc
+*.map
+*.dep
+*.bak
+*.log
+*.ilk
+*.aps
+*.ncb
+*.suo
+*.suo.*
+
+# IDE specific files
+.vs/
+.idea/
+*.sln.DotSettings.user
+*.sln.DotSettings
+
+# Package Manager
+packages/
+node_modules/
+npm-debug.log
+
+# Mac OS
+.DS_Store
+
+# ReSharper
+*.ReSharper
+
+# Unit Test Runner
+TestResults/
+
 # User-specific files
 *.rsuser
 *.suo
