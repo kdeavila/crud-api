@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("crud-api.UnitTests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+700b812e2120b2d7e8d90bd2a5c965f0ebe1c79f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7fc73453433f0392b4c8c6ba2567f68a496b5753")]
 [assembly: System.Reflection.AssemblyProductAttribute("crud-api.UnitTests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("crud-api.UnitTests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
