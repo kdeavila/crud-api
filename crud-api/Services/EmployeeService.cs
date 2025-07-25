@@ -121,7 +121,7 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
             return new ServiceResult<EmployeeGetDto>
             {
                 Status = ServiceResultStatus.NotFound,
-                Message = $"Employee with id {id} not found"
+                Message = $"Employee with id {id} does not exist."
             };
         }
 
@@ -142,7 +142,7 @@ public class EmployeeService(AppDbContext context, ILogger<EmployeeService> logg
                 return new ServiceResult<EmployeeGetDto>
                 {
                     Status = ServiceResultStatus.InvalidInput,
-                    Message = $"Profile with id {employeeCreateDto.IdProfile} does not exist"
+                    Message = $"Profile with id {employeeCreateDto.IdProfile} does not exist."
                 };
             }
 
