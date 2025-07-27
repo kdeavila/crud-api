@@ -30,6 +30,12 @@ builder.Services.AddAuthentication(config =>
     config.SaveToken = true;
 
     var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+    if (jwtSettings is null)
+    {
+        throw new InvalidOperationException("JwtSetting is missing or invalid");
+    }
+    
     var keyBytes = Encoding.UTF8.GetBytes(jwtSettings!.SecretKey);
 
     config.TokenValidationParameters = new TokenValidationParameters

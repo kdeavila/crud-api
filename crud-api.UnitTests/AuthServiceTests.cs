@@ -129,10 +129,43 @@ public class AuthServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Register_ShouldReturnSuccess_WhenUserIsCreated()
+    public async Task Login_ShouldReturnJwt_InsensitiveEmailCase()
     {
         // Arrange
-        var userRegisterDto = new UserRegisterDto()
+        const string password = "password_example";
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+        var user = new User()
+        {
+            Email = "EMAIL@example.com",
+            PasswordHash = passwordHash,
+            Role = UserRole.Admin
+        };
+
+        await _context.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        var userLoginDto = new UserLoginDto
+        {
+            Email = "email@example.com",
+            Password = password
+        };
+
+        // Act
+        var result = await _authService.Login(userLoginDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.Success, result.Status);
+        Assert.False(string.IsNullOrEmpty(result.JWT));
+        Assert.Equal("Login successful", result.Message);
+    }
+
+    [Fact]
+    public async Task Register_ShouldReturnSuccess_WhenUserIsCreated()
+    {
+        // Arrange  
+        var userRegisterDto = new UserRegisterDto
         {
             Email = "admin@example.com",
             Password = BCrypt.Net.BCrypt.HashPassword("password_example"),
@@ -141,11 +174,50 @@ public class AuthServiceTests : IDisposable
 
         // Act
         var result = await _authService.Register(userRegisterDto);
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(ServiceResultStatus.Success, result.Status);
         Assert.Equal("Registration successful", result.Message);
         Assert.True(string.IsNullOrEmpty(result.JWT));
+
+        var userInDb = await _context.Users.SingleOrDefaultAsync(u => u.Email == userRegisterDto.Email);
+        Assert.NotNull(userInDb);
+        Assert.True(BCrypt.Net.BCrypt.Verify(userRegisterDto.Password, userInDb.PasswordHash));
     }
+
+    [Fact]
+    public async Task Register_ShouldReturnConflict_WhenUserAlreadyExists()
+    {
+        // Arrange
+        const string password = "password_example";
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
+        var user = new User
+        {
+            Email = "admin@example.com",
+            PasswordHash = passwordHash,
+            Role = UserRole.Admin
+        };
+        
+        await _context.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        var userRegisterDto = new UserRegisterDto
+        {
+            Email = "admin@example.com",
+            Password = password
+        };
+        
+        // Act
+        var result = await _authService.Register(userRegisterDto);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.Conflict, result.Status);
+        Assert.Equal("User already exists", result.Message);
+        Assert.Null(result.JWT);
+    }
+    
+    
 }

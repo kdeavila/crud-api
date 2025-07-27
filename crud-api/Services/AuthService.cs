@@ -7,13 +7,11 @@ using crud_api.Common;
 using crud_api.Context;
 using crud_api.DTOs.Auth;
 using crud_api.Entities;
+using crud_api.Interfaces;
 using crud_api.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace crud_api.Services;
-
-using crud_api.Interfaces;
-
 public class AuthService(AppDbContext context, IOptions<JwtSettings> jwtSettings) : IAuthService
 {
     private readonly AppDbContext _context = context;
@@ -44,9 +42,9 @@ public class AuthService(AppDbContext context, IOptions<JwtSettings> jwtSettings
 
     public async Task<AuthServiceResult> Login(UserLoginDto userLoginDto)
     {
+        var normalizedEmail = userLoginDto.Email.ToLower();
         var dbUser = await _context.Users
-            .Where(u => u.Email == userLoginDto.Email)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (dbUser is null)
         {
