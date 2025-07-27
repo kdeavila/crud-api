@@ -124,8 +124,9 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 
 ## 🌟 Próximas Mejoras
 
-* Implementación de pruebas unitarias y de integración.
-* Mejorar las pruebas unitarias existentes para cubrir escenarios de fallo (usuarios no existentes, contraseñas incorrectas) y casos de borde.
+* ✅ Implementación de pruebas unitarias y de integración.
+* Implementar pruebas de integración para los casos de uso de la API.
+* Implementar pruebas unitarias para `UserService`.
 
 ## 📝 Autoría
 
