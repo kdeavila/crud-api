@@ -84,10 +84,10 @@ public class AuthServiceTests : IDisposable
             Email = "email@example.com",
             Password = "password_example"
         };
-        
+
         // Act
         var result = await _authService.Login(userLoginDto);
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(ServiceResultStatus.NotFound, result.Status);
@@ -117,14 +117,35 @@ public class AuthServiceTests : IDisposable
             Email = "email@example.com",
             Password = "password_invalid"
         };
-        
+
         // Act
         var result = await _authService.Login(userLoginDto);
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(ServiceResultStatus.InvalidInput, result.Status);
         Assert.Equal("Invalid password", result.Message);
         Assert.Null(result.JWT);
+    }
+
+    [Fact]
+    public async Task Register_ShouldReturnSuccess_WhenUserIsCreated()
+    {
+        // Arrange
+        var userRegisterDto = new UserRegisterDto()
+        {
+            Email = "admin@example.com",
+            Password = BCrypt.Net.BCrypt.HashPassword("password_example"),
+            Role = UserRole.Admin
+        };
+
+        // Act
+        var result = await _authService.Register(userRegisterDto);
+        
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.Success, result.Status);
+        Assert.Equal("Registration successful", result.Message);
+        Assert.True(string.IsNullOrEmpty(result.JWT));
     }
 }
