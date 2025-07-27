@@ -30,6 +30,13 @@ Este proyecto demuestra una API Web robusta y estructurada con **ASP.NET Core (.
 * **BCrypt.Net-Core** (para hashing de contraseñas)
 * **DBeaver** (o SQL Server Management Studio para gestión de BD)
 
+## 📂 Estructura del Proyecto
+
+El repositorio está organizado en dos proyectos principales:
+
+*   `crud-api`: Contiene el proyecto principal de la API web de ASP.NET Core. Aquí se encuentran los controladores, servicios, entidades y toda la lógica de la aplicación.
+*   `crud-api.UnitTests`: Contiene las pruebas unitarias para los servicios de la aplicación, asegurando la calidad y el correcto funcionamiento de la lógica de negocio.
+
 ## ▶️ Cómo Empezar
 
 ### ✔️ Prerequisitos
