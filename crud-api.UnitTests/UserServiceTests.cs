@@ -167,7 +167,7 @@ public class UserServiceTests : IDisposable
         Assert.Empty(result.Data.Data!);
     }
 
-    [Fact]  
+    [Fact]
     public async Task GetById_ShouldReturnUser_WhenUserExists()
     {
         // Arrange
@@ -245,5 +245,128 @@ public class UserServiceTests : IDisposable
         Assert.NotNull(result.Data);
         Assert.Equal(id, result.Data!.Id);
         Assert.Equal(UserRole.Viewer, result.Data.Role);
+    }
+
+    [Fact]
+    public async Task Update_ShouldReturnInvalidInput_WhenIdDoesNotMatch()
+    {
+        // Arrange
+        var userUpdateDto = new UserUpdateDto
+        {
+            Id = 1,
+            Email = "admin@example.com",
+            Role = UserRole.Admin
+        };
+
+        // Act
+        var result = await _userService.Update(2, userUpdateDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.InvalidInput, result.Status);
+        Assert.Null(result.Data);
+        Assert.Equal("Id in path and body do not match.", result.Message);
+    }
+
+    [Fact]
+    public async Task Update_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Assert
+        var userUpdateDto = new UserUpdateDto
+        {
+            Id = 1,
+            Email = "admin@example.com",
+            Role = UserRole.Admin
+        };
+
+        // Act
+        var result = await _userService.Update(1, userUpdateDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.NotFound, result.Status);
+        Assert.Null(result.Data);
+        Assert.Equal($"User with id {userUpdateDto.Id} not found", result.Message);
+    }
+
+    [Fact]
+    public async Task Update_ShouldReturnConflict_WhenEmailAlreadyExists()
+    {
+        // Arrange
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword("password_example");
+
+        var user1 = new User
+        {
+            Id = 1,
+            Email = "admin@example.com",
+            PasswordHash = passwordHash,
+            Role = UserRole.Admin
+        };
+
+        var user2 = new User
+        {
+            Id = 2,
+            Email = "viewer@example.com",
+            PasswordHash = passwordHash,
+            Role = UserRole.Viewer
+        };
+
+        await _context.AddRangeAsync(user1, user2);
+        await _context.SaveChangesAsync();
+
+        var userUpdateDto = new UserUpdateDto
+        {
+            Id = 2,
+            Email = "admin@example.com",
+            Role = UserRole.Viewer
+        };
+
+        // Act
+        var result = await _userService.Update(2, userUpdateDto);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.Conflict, result.Status);
+        Assert.Null(result.Data);
+        Assert.Equal($"Email {userUpdateDto.Email} already exists", result.Message);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnSuccess_WhenUserDeleted()
+    {
+        // Arrange
+        var user = new User
+        {
+            Email = "admin@example.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("password_example"),
+            Role = UserRole.Admin
+        };
+
+        await _context.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _userService.Delete(user.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.Deleted, result.Status);
+        Assert.True(result.Data);
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        const int id = 1;
+
+        // Act
+        var result = await _userService.Delete(id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(ServiceResultStatus.NotFound, result.Status);
+        Assert.False(result.Data);
+        Assert.Equal($"User with id {id} not found.", result.Message);
     }
 }
