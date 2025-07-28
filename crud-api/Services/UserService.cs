@@ -99,7 +99,7 @@ public class UserService(AppDbContext context, ILogger<UserService> logger) : IU
             return new ServiceResult<UserGetDto>
             {
                 Status = ServiceResultStatus.NotFound,
-                Message = $"User with id {id} not found"
+                Message = $"User with id {id} does not exist."
             };
         }
 
