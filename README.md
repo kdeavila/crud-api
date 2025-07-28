@@ -124,9 +124,8 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 
 ## 🌟 Próximas Mejoras
 
-* ✅ Implementación de pruebas unitarias y de integración.
-* Implementar pruebas de integración para los casos de uso de la API.
-* Implementar pruebas unitarias para `UserService`.
+* Implementar pruebas de integración para los casos de uso de la API para validar los flujos de trabajo de extremo a extremo.
+* Implementar un mecanismo de **limitación de velocidad (rate limiting)** para prevenir el abuso de la API y asegurar la disponibilidad del servicio.
 
 ## 📝 Autoría
 
