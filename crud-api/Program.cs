@@ -98,7 +98,7 @@ builder.Services.AddRateLimiter(options =>
 {
     options.AddSlidingWindowLimiter(policyName: "sliding", limiterOptions =>
     {
-        limiterOptions.PermitLimit = 100;
+        limiterOptions.PermitLimit = 20;
         limiterOptions.Window = TimeSpan.FromMinutes(1);
         limiterOptions.SegmentsPerWindow = 4;
     });

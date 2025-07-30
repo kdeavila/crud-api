@@ -30,6 +30,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             table.HasKey(col => col.Id);
             table.Property(col => col.Id).UseIdentityColumn().ValueGeneratedOnAdd();
             table.Property(col => col.FullName).HasMaxLength(50);
+            table.Property(e => e.Salary).HasColumnType("decimal(18, 2)");
             table.HasOne(col => col.ProfileReference)
                 .WithMany(p => p.EmployeesReference)
                 .HasForeignKey(col => col.IdProfile)

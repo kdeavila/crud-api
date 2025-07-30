@@ -3,11 +3,13 @@ using crud_api.Interfaces;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace crud_api.Controllers;
 
 [Route("/api/[controller]")]
 [ApiController]
+[EnableRateLimiting("sliding")]
 public class UserController(IUserService userService) : BaseController
 {
     private readonly IUserService _userService = userService;

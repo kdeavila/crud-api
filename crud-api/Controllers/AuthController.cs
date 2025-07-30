@@ -3,6 +3,7 @@ using crud_api.DTOs.Auth;
 using crud_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace crud_api.Controllers;
 
@@ -10,6 +11,7 @@ using crud_api.Interfaces;
 
 [Route("/api/[controller]")]
 [ApiController]
+[EnableRateLimiting("sliding")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost]
@@ -21,6 +23,7 @@ public class AuthController(IAuthService authService) : ControllerBase
             return BadRequest(ModelState);
         }
 
+        
         var result = await authService.Login(userLoginDto);
 
         return (result.Status) switch
