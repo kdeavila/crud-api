@@ -14,7 +14,6 @@ public class EmployeeServiceTests : IDisposable
     private readonly AppDbContext _context;
     private readonly EmployeeService _employeeService;
     private readonly Mock<ILogger<EmployeeService>> _loggerMock;
-
     public EmployeeServiceTests()
     {
         var dbContextOptions = new DbContextOptionsBuilder<AppDbContext>()
@@ -274,16 +273,34 @@ public class EmployeeServiceTests : IDisposable
     public async Task Update_ShouldReturnInvalidInput_WhenIdMismatch()
     {
         // Arrange
-        var employeeUpdateDto = new EmployeeUpdateDto()
+        var employee1 = new Employee
         {
-            Id = 2,
             FullName = "Keyner de Ávila",
             IdProfile = 1,
-            Salary = 47500
+            Salary = 47500,
+        };
+        var employee2 = new Employee
+        {
+            FullName = "Manuel Teherán",
+            IdProfile = 1,
+            Salary = 52000
+        };
+
+        var profile = new Profile { Id = 1, Name = "Developer" };
+
+        await _context.AddRangeAsync(employee1, employee2, profile);
+        await _context.SaveChangesAsync();
+
+        var employeeUpdateDto = new EmployeeUpdateDto()
+        {
+            Id = 1,
+            FullName = "Keyner de Ávila",
+            IdProfile = 1,
+            Salary = 58000
         };
 
         // Act
-        var result = await _employeeService.Update(1, employeeUpdateDto);
+        var result = await _employeeService.Update(2, employeeUpdateDto);
 
         // Assert
         Assert.NotNull(result);
@@ -296,8 +313,15 @@ public class EmployeeServiceTests : IDisposable
     public async Task Update_ShouldReturnInvalidInput_WhenProfileDoesNotExist()
     {
         // Arrange
-        var employee = new Employee { Id = 1, FullName = "Keyner de Ávila", IdProfile = 1, Salary = 47500 };
-        await _context.AddAsync(employee);
+        var employee = new Employee
+        {
+            Id = 1,
+            FullName = "Keyner de Ávila",
+            IdProfile = 1,
+            Salary = 47500
+        };
+        var profile = new Profile { Id = 1, Name = "Developer" };
+        await _context.AddRangeAsync(employee, profile);
         await _context.SaveChangesAsync();
 
         var employeeUpdateDto = new EmployeeUpdateDto()
