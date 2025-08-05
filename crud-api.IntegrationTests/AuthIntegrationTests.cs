@@ -1,8 +1,6 @@
 using System.Net.Http.Json;
 using crud_api.DTOs.Auth;
 using System.Net;
-using crud_api.Common;
-using crud_api.Entities;
 
 namespace crud_api.IntegrationTests;
 
@@ -24,5 +22,12 @@ public class AuthIntegrationTests(CustomWebApplicationFactory<Program> factory)
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto);
         
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Login_WithValidCredentials_ReturnsOkWithJWT()
+    {
+        // Arrange
+        
     }
 }
