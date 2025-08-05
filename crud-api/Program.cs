@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Runtime.CompilerServices;
 using crud_api.Common;
 using crud_api.Context;
 using crud_api.DTOs.Common;
@@ -14,6 +15,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
+[assembly: InternalsVisibleTo("crud-api.IntegrationTests")]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -169,3 +172,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

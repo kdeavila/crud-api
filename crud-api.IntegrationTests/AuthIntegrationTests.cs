@@ -1,8 +1,8 @@
-using System.Net;
 using System.Net.Http.Json;
 using crud_api.DTOs.Auth;
-using FluentAssertions;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using System.Net;
+using crud_api.Common;
+using crud_api.Entities;
 
 namespace crud_api.IntegrationTests;
 
@@ -13,16 +13,16 @@ public class AuthIntegrationTests(CustomWebApplicationFactory<Program> factory)
     private readonly HttpClient _client = factory.CreateClient();
 
     [Fact]
-    public async Task Login_WithInvalidCredentials_ReturnsUnauthorized()
+    public async Task Login_WithNonExistentUser_ReturnsNotFound()
     {
         var loginDto = new UserLoginDto
         {
-            Email = "invalidEmail",
+            Email = "invalid@example.com",
             Password = "invalidPassword"
         };
 
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto);
-
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

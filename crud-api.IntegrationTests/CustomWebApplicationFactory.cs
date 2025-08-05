@@ -13,14 +13,23 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         builder.ConfigureServices(services =>
         {
             var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-
             if (descriptor != null)
             {
                 services.Remove(descriptor);
             }
 
+            var contextDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(AppDbContext));
+            if (contextDescriptor != null)
+            {
+                services.Remove(contextDescriptor);
+            }
+            
             services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase("InMemoryDbForTesting"));
+            {
+                options.UseInMemoryDatabase("InMemoryDbForTesting");
+            });
         });
+        
+        builder.UseEnvironment("Testing");
     }
 }
