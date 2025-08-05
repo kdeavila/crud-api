@@ -28,6 +28,25 @@ public class AuthIntegrationTests(CustomWebApplicationFactory<Program> factory)
     public async Task Login_WithValidCredentials_ReturnsOkWithJWT()
     {
         // Arrange
-        
+        var loginDto = new UserLoginDto
+        {
+            Email = "admin@example.com",
+            Password = "adminexample123!"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/auth/login", loginDto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadFromJsonAsync<AuthToken>();
+        Assert.NotNull(content);
+        Assert.False(string.IsNullOrWhiteSpace(content.JWT));
     }
+}
+
+internal class AuthToken
+{
+    public string? JWT { get; set; }
 }
