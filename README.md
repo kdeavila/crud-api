@@ -122,9 +122,23 @@ Para facilitar la interacción con la API, se proporciona una colección de Inso
 
 ---
 
-## 🌟 Próximas Mejoras
+## 🧪 Testing
 
-* Implementar pruebas de integración para los casos de uso de la API para validar los flujos de trabajo de extremo a extremo.
+El proyecto cuenta con pruebas unitarias (`crud-api.UnitTests`) para la lógica de negocio y pruebas de integración (`crud-api.IntegrationTests`) para validar los flujos de la API.
+
+**Pruebas de Integración (Auth):**
+- ✅ Login exitoso.
+- ✅ Login con usuario no existente.
+
+### Próximas Mejoras o Tareas Pendientes
+
+- **Login:**
+    - [ ] Login con contraseña incorrecta.
+- **Registro:**
+    - [ ] Registro de un nuevo usuario con datos válidos.
+    - [ ] Registro con un email que ya existe en la base de datos.
+    - [ ] Registro con un rol de usuario inválido.
+    - [ ] Registro con una contraseña débil.
 
 ## 📝 Autoría
 
